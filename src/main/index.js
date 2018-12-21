@@ -23,7 +23,12 @@ function createWindow () {
     height: 563,
     useContentSize: true,
     width: 1000,
-    frame: false // 去除菜单
+    frame: false, // 去除菜单
+    webPreferences: {
+      webSecurity: false, // 设置跨域
+      allowDisplayingInsecureContent: true, // 允许http资源
+      allowRunningInsecureContent: true
+    }
   })
 
   mainWindow.loadURL(winURL)
