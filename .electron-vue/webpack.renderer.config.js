@@ -22,7 +22,8 @@ const { VueLoaderPlugin } = require('vue-loader')
 let whiteListedModules = ['vue']
 
 let rendererConfig = {
-  devtool: '#cheap-module-eval-source-map',
+  // devtool: '#cheap-module-eval-source-map',
+  devtool: '#source-map',
   entry: {
     renderer: path.join(__dirname, '../src/renderer/main.js')
   },
@@ -121,7 +122,7 @@ let rendererConfig = {
   },
   plugins: [
     new VueLoaderPlugin(),
-    new MiniCssExtractPlugin({filename: 'styles.css'}),
+    new MiniCssExtractPlugin({ filename: 'styles.css' }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: path.resolve(__dirname, '../src/index.ejs'),
