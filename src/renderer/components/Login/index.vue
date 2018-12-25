@@ -11,7 +11,6 @@
       ref="webview"
       class="login-webview"
       src="http://live.bilibili.com/p/eden/rank#/childnav/vitality/0"
-      preload="./index.js"
     />
     <span
       slot="footer"
@@ -52,11 +51,8 @@ export default {
     // open
     open () {
       const webview = this.$refs.webview
-      debugger
       // 当页面加载的时候获取Cookie
-      webview.addEventListener('dom-ready', (data) => {
-        console.log(data)
-        debugger
+      webview.addEventListener('dom-ready', () => {
         // webview.openDevTools()
         let session = webview.getWebContents().session
         session.cookies.get({ url: 'http://live.bilibili.com' }, (err, cookies) => {
