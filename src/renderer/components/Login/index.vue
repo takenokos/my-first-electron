@@ -11,6 +11,7 @@
       ref="webview"
       class="login-webview"
       src="http://live.bilibili.com/p/eden/rank#/childnav/vitality/0"
+      :preload="preload"
     />
     <span
       slot="footer"
@@ -29,12 +30,18 @@
   </el-dialog>
 </template>
 <script>
+import path from 'path'
 export default {
   name: 'LoginDialog',
   props: {
     visible: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      preload: `file:${path.resolve(__dirname, './live.js')}`
     }
   },
   computed: {
@@ -51,6 +58,7 @@ export default {
     // open
     open () {
       const webview = this.$refs.webview
+      webview.openDevTools()
       // 当页面加载的时候获取Cookie
       webview.addEventListener('dom-ready', () => {
         // webview.openDevTools()
@@ -90,15 +98,17 @@ export default {
 </script>
 <style lang="scss" scoped>
 .login-webview {
-  width: 436px;
+  width: 420px;
   height: 490px;
-  margin-top: -72px;
+  margin: -112px auto 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
 }
 </style>
 
 <style scoped>
 .login-dialog >>> .el-dialog__body {
   overflow: hidden;
-  height: 350px;
+  padding: 0;
 }
 </style>
