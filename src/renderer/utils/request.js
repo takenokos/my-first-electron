@@ -4,6 +4,7 @@ import { Message } from 'element-ui'
 // create an axios instance
 const service = axios.create({
   // baseURL: process.env.BASE_API, // api 的 base_url
+  withCredentials: true, // 允许cookie跨域
   timeout: 15000 // request timeout
 })
 
@@ -27,7 +28,9 @@ service.interceptors.request.use(
 
 // response interceptor
 service.interceptors.response.use(
-  response => response,
+  response => {
+    return Promise.resolve(response.data)
+  },
   error => {
     console.log('err' + error) // for debug
     Message({

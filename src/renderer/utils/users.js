@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
+import { Message } from 'element-ui'
 const userPath = path.join(__dirname, '..', `\\user`)
-// console.log(_path) // 测试路径对不对的
 // 读取用户目录
 export function readUsers () {
   return new Promise((resolve, reject) => {
@@ -21,7 +21,14 @@ export function readUsers () {
 export function updateUser (username, json) {
   const _path = path.join(userPath, `\\${username}.txt`)
   dirExists(userPath).then(() => {
-    write(_path, JSON.stringify(json))
+    return write(_path, JSON.stringify(json))
+  }).then(bol => {
+    if (bol) {
+      Message({
+        message: '用户信息已保存',
+        type: 'success'
+      })
+    }
   })
 }
 
@@ -74,14 +81,16 @@ function mkdir (dir) {
 }
 // 写入文件内容
 function write (path, content) {
-  fs.open(path, 'w', (err, fd) => {
-    if (err) throw err
-    fs.writeFile(fd, content, (err) => {
-      fs.close(fd, (err) => {
-        if (err) throw err
-      })
+  return new Promise(resolve => {
+    fs.open(path, 'w', (err, fd) => {
       if (err) throw err
-      console.log('文件已保存')
+      fs.writeFile(fd, content, (err) => {
+        fs.close(fd, (err) => {
+          if (err) throw err
+        })
+        if (err) throw err
+        resolve(true)
+      })
     })
   })
 }

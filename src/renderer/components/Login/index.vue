@@ -17,20 +17,18 @@
       slot="footer"
       class="dialog-footer"
     >
-      <el-button @click="reloadWeb">重载</el-button>
-      <el-button
-        type="info"
-        @click="dialogVisible = false"
-      >取 消</el-button>
       <el-button
         type="primary"
-        @click="dialogVisible = false"
-      >确 定</el-button>
+        @click="reloadWeb"
+      >重载</el-button>
+      <el-button @click="dialogVisible = false">关闭</el-button>
     </span>
   </el-dialog>
 </template>
 <script>
 import path from 'path'
+import { getUserInfo } from '../../api/login'
+import { updateUser } from '../../utils/users'
 export default {
   name: 'LoginDialog',
   props: {
@@ -58,32 +56,26 @@ export default {
     // open
     open () {
       const webview = this.$refs.webview
-      webview.openDevTools()
+      // webview.openDevTools()
       // 当页面加载的时候获取Cookie
       webview.addEventListener('dom-ready', () => {
-        // webview.openDevTools()
         let session = webview.getWebContents().session
         session.cookies.get({ url: 'http://live.bilibili.com' }, (err, cookies) => {
           if (err) throw err
           let cookieObj = {}
           cookies.forEach(ele => {
-            cookieObj[ele.key] = ele.value
+            cookieObj[ele.name] = ele.value
           })
-          console.log(cookieObj)
-          session.clearStorageData({
-            'storages': ['cookies']
-          })
-          // webview.reload()
-          // if (cookieStr.indexOf('DedeUserID=') === -1) { // DedeUserID 是 用户 uid
-          //   // 未登录
-          // } else {
-          //   // 已经登录
-          //   // $('#iptCookie').val(cookieStr)
-          //   session.clearStorageData({
-          //     'storages': ['cookies']
-          //   })
-          //   webview.reload()
-          // }
+          if (cookieObj.DedeUserID) { // DedeUserID 是 用户 uid
+            getUserInfo(cookieObj).then(res => {
+              const userInfo = res.data
+              updateUser(cookieObj.DedeUserID, { info: userInfo, cookie: cookieObj })
+              session.clearStorageData({
+                'storages': ['cookies']
+              })
+              webview.reload()
+            })
+          }
         })
       })
     },
