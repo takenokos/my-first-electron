@@ -30,21 +30,23 @@ export function addUser (obj) {
 }
 // 更新用户信息
 export function updateUser (obj) {
-  const val = userDb.find({ uid: obj.uid }).value()
-  if (!val) {
-    Message({
-      message: '用户不存在',
-      type: 'error'
-    })
-    resolve
-  } else {
-    userDb
-      .find({ uid: obj.uid })
-      .assign(obj)
-    Message({
-      message: '用户信息已保存',
-      type: 'success'
-    })
-    resolve()
-  }
+  return new Promise((resolve, reject) => {
+    const val = userDb.find({ uid: obj.uid }).value()
+    if (!val) {
+      Message({
+        message: '用户不存在',
+        type: 'error'
+      })
+      resolve()
+    } else {
+      userDb
+        .find({ uid: obj.uid })
+        .assign(obj)
+      Message({
+        message: '用户信息已保存',
+        type: 'success'
+      })
+      resolve()
+    }
+  })
 }
