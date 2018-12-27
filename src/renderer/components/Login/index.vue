@@ -28,7 +28,7 @@
 <script>
 import path from 'path'
 import { getUserInfo } from '../../api/login'
-import { updateUser } from '../../utils/users'
+import { addUser } from '../../utils/users-db'
 export default {
   name: 'LoginDialog',
   props: {
@@ -70,7 +70,7 @@ export default {
           if (cookieObj.DedeUserID) { // DedeUserID 是 用户 uid
             getUserInfo(cookieObj).then(res => {
               const userInfo = res.data
-              updateUser(cookieObj.DedeUserID, { info: userInfo, cookie: cookieObj })
+              addUser({ uid: cookieObj.DedeUserID, info: userInfo, cookie: cookieObj })
               session.clearStorageData({
                 'storages': ['cookies']
               })

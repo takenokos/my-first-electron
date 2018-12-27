@@ -7,8 +7,10 @@ import store from './store'
 import Element from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import db from '../db/index'
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
+Vue.prototype.$db = db
 Vue.config.productionTip = false
 Vue.use(Element)
 /* eslint-disable no-new */

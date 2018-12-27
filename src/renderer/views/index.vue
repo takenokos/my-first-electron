@@ -14,7 +14,7 @@
 </template>
 <script>
 import { ipcRenderer } from 'electron'
-import { readUsers, updateUser } from '../utils/users'
+import { getUsers } from '../utils/users-db.js'
 import LoginDialog from '../components/Login/index'
 export default {
   name: 'index',
@@ -31,10 +31,10 @@ export default {
       ipcRenderer.send('min-window')
     },
     addFile () {
-      updateUser('test', { 'test': 'test' })
+      // addUser('test', { 'test': 'test' })
     },
     readFile () {
-      readUsers().then(data => {
+      getUsers().then(data => {
         console.log(data)
       })
     }
