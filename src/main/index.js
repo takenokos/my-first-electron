@@ -7,7 +7,7 @@ import path from 'path'
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
  */
 if (process.env.NODE_ENV !== 'development') {
-  global.__static = require('path').join(__dirname, '/static').replace(/\\/g, '\\\\')
+  global.__static = path.join(__dirname, '/static').replace(/\\/g, '\\\\')
 }
 
 let mainWindow
@@ -58,7 +58,12 @@ function createWindow () {
     tray.setHighlightMode('never')
   })
   // 系统托盘
-  const tray = new Tray(path.join(__dirname, '../../build/icons/icon.ico'))
+  // const tray = new Tray(path.join(__dirname, '../../build/icons/icon.ico'))
+  // const trayIcon = path.join(__dirname, 'build/icons/icon.ico')
+  // const tray = new Tray(nativeImage.createFromPath(trayIcon))
+  // const tray = new Tray(trayIcon)
+  const trayIcon = `${__static}/icon.ico`
+  const tray = new Tray(trayIcon)
   const contextMenu = Menu.buildFromTemplate([
     { label: '退出', click: () => { mainWindow.destroy() } } // 我们需要在这里有一个真正的退出（这里直接强制退出）
   ])

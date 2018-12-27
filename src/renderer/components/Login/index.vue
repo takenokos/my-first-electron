@@ -39,7 +39,8 @@ export default {
   },
   data () {
     return {
-      preload: `file:${path.resolve(__dirname, './live.js')}`
+      // preload: `file:${path.resolve(__dirname, './live.js')}`
+      preload: `file://${path.join(__static, '/live.js')}`
     }
   },
   computed: {

@@ -1,4 +1,4 @@
-import request from '../utils/request'
+import request from '@/utils/request'
 import Cookies from 'js-cookie'
 
 export function getUserInfo (obj) {
