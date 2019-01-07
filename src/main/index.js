@@ -25,7 +25,7 @@ function createWindow () {
     width: 800,
     frame: false, // 去除菜单
     fullscreenable: false, // 不可全屏
-    resizable: false, // 不可改变大小
+    // resizable: false, // 不可改变大小
     webPreferences: {
       webSecurity: false, // 设置跨域
       allowDisplayingInsecureContent: true, // 允许http资源

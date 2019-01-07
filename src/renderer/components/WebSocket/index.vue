@@ -24,20 +24,23 @@
   </div>
 </template>
 <script>
-import { encode, decode, decodeInt, decodeJson } from 'encode'
 export default {
   name: 'WebSocket',
   props: {
     user: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data () {
     return {
       roomId: null,
-      messages: ['请先连接房间']
+      messages: ['请先连接房间'],
+      WebSocket: null
     }
+  },
+  destroyed () {
+    this.WebSocket = null
   },
   methods: {
     // 连接房间 弹幕池
@@ -50,26 +53,22 @@ export default {
         return
       }
       // 连接弹幕池
-      const ws = new WebSocket('wss://broadcastlv.chat.bilibili.com:2245/sub')
+      this.WebSocket = new WebSocket('wss://broadcastlv.chat.bilibili.com:2245/sub')
+      const ws = this.WebSocket
       // 进房请求
-      ws.on('open', function () {
-        ws.send(
-          encode(
-            JSON.stringify({
-              roomid: this.roomId
-            }),
-            7
-          )
-        )
-      })
-      // 30s 心跳保持连接
-      setInterval(function () {
-        ws.send(encode('', 2))
-      }, 30000)
+      ws.onopen = () => {
+        ws.send(encodeURI(JSON.stringify({
+          roomid: this.roomId
+        }), 7))
+
+        // 之后发送心跳
+        this.heartBeat()
+      }
+
       // 接收
-      ws.on('message', function (data) {
+      ws.onmessage = data => {
         console.log('data:' + data)
-        const packets = decode(data)
+        const packets = decodeURI(data)
         for (let i = 0; i < packets.length; ++i) {
           const packet = packets[i]
           switch (packet.op) {
@@ -77,35 +76,78 @@ export default {
               console.log('加入房间')
               break
             case 3:
-              const count = decodeInt(packet.data)
-              console.log(`人气：${count}`)
+              // const count = decodeInt(packet.data)
+              // console.log(`人气：${count}`)
               break
             case 5:
-              const body = decodeJson(packet.data)
-              switch (body.cmd) {
-                case 'DANMU_MSG':
-                  console.log(`${body.info[2][1]}: ${body.info[1]}`)
-                  break
-                case 'SEND_GIFT':
-                  console.log(
-                    `${body.data.uname} ${body.data.action} ${
-                      body.data.num
-                    } 个 ${body.data.giftName}`
-                  )
-                  break
-                case 'WELCOME':
-                  console.log(`欢迎 ${body.data.uname}`)
-                  break
-                // 此处省略很多其他通知类型
-                default:
-                  console.log(body)
-              }
+              // const body = decodeJson(packet.data)
+              // switch (body.cmd) {
+              //   case 'DANMU_MSG':
+              //     console.log(`${body.info[2][1]}: ${body.info[1]}`)
+              //     break
+              //   case 'SEND_GIFT':
+              //     console.log(
+              //       `${body.data.uname} ${body.data.action} ${body.data.num} 个 ${body.data.giftName}`
+              //     )
+              //     break
+              //   case 'WELCOME':
+              //     console.log(`欢迎 ${body.data.uname}`)
+              //     break
+              //   // 此处省略很多其他通知类型
+              //   default:
+              //     console.log(body)
+              // }
               break
             default:
               console.log(packet)
           }
         }
-      })
+      }
+      // ws.on('message', function (data) {
+      //   console.log('data:' + data)
+      //   const packets = decode(data)
+      //   for (let i = 0; i < packets.length; ++i) {
+      //     const packet = packets[i]
+      //     switch (packet.op) {
+      //       case 8:
+      //         console.log('加入房间')
+      //         break
+      //       case 3:
+      //         const count = decodeInt(packet.data)
+      //         console.log(`人气：${count}`)
+      //         break
+      //       case 5:
+      //         const body = decodeJson(packet.data)
+      //         switch (body.cmd) {
+      //           case 'DANMU_MSG':
+      //             console.log(`${body.info[2][1]}: ${body.info[1]}`)
+      //             break
+      //           case 'SEND_GIFT':
+      //             console.log(
+      //               `${body.data.uname} ${body.data.action} ${body.data.num} 个 ${body.data.giftName}`
+      //             )
+      //             break
+      //           case 'WELCOME':
+      //             console.log(`欢迎 ${body.data.uname}`)
+      //             break
+      //           // 此处省略很多其他通知类型
+      //           default:
+      //             console.log(body)
+      //         }
+      //         break
+      //       default:
+      //         console.log(packet)
+      //     }
+      //   }
+      // })
+    },
+    // 心跳
+    heartBeat () {
+      // 30s 心跳保持连接
+      const _this = this
+      setInterval(function () {
+        _this.WebSocket.send(encodeURI('', 2))
+      }, 3000)
     }
   }
 }
