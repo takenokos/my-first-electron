@@ -20,10 +20,12 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 450,
     useContentSize: true,
-    width: 1000,
+    width: 800,
     frame: false, // 去除菜单
+    fullscreenable: false, // 不可全屏
+    resizable: false, // 不可改变大小
     webPreferences: {
       webSecurity: false, // 设置跨域
       allowDisplayingInsecureContent: true, // 允许http资源
@@ -37,15 +39,19 @@ function createWindow () {
     mainWindow = null
   })
   // 自定义菜单按钮
-  // 关闭按钮
+  // 关闭
   ipcMain.on('close-window', () => {
     mainWindow.close()
+  })
+  // 最小化到托盘
+  ipcMain.on('hide-window', () => {
+    mainWindow.hide()
   })
   // 最小化
   ipcMain.on('min-window', () => {
     mainWindow.minimize()
   })
-  // 禁止直接关闭
+  // 禁止直接关闭 ?是否需要 已自定义窗口
   mainWindow.on('close', (event) => {
     mainWindow.hide()
     mainWindow.setSkipTaskbar(true)

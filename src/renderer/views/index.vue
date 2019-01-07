@@ -1,25 +1,29 @@
 <template>
-  <div class="main">
-    <div class="menu">
-      <a
-        class="min"
-        @click="min"
-      >-</a>
-      <el-button @click="addFile">测试写入文件</el-button>
+  <div class="index-main">
+    <el-row
+      :gutter="20"
+      type="flex"
+    >
+      <el-col :span="16" />
+      <el-col :span="8">
+        <web-socket />
+      </el-col>
+    </el-row>
+    <!-- <el-button @click="addFile">测试写入文件</el-button>
       <el-button @click="readFile">测试读取文件</el-button>
-      <el-button @click="loginDialogVisible=true">登陆</el-button>
-    </div>
+      <el-button @click="loginDialogVisible=true">登陆</el-button>  -->
     <login-dialog :visible.sync="loginDialogVisible" />
   </div>
 </template>
 <script>
-import { ipcRenderer } from 'electron'
-import { getUsers } from '../utils/users-db.js'
-import LoginDialog from '../components/Login/index'
+import { getUsers } from '@/utils/users-db.js'
+import LoginDialog from '@/components/Login/index'
+import WebSocket from '@/components/WebSocket/index'
 export default {
   name: 'index',
   components: {
-    LoginDialog
+    LoginDialog,
+    WebSocket
   },
   data () {
     return {
@@ -27,9 +31,6 @@ export default {
     }
   },
   methods: {
-    min () {
-      ipcRenderer.send('min-window')
-    },
     addFile () {
       // addUser('test', { 'test': 'test' })
     },
@@ -41,13 +42,3 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
-.main {
-  position: relative;
-  .menu {
-    .min {
-      cursor: pointer;
-    }
-  }
-}
-</style>

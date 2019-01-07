@@ -9,6 +9,7 @@ module.exports = {
     node: true
   },
   extends: 'standard',
+  plugins: ['vue', 'html'],
   globals: {
     __static: true
   },

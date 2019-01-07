@@ -13,7 +13,6 @@ Vue.http = Vue.prototype.$http = axios
 Vue.prototype.$db = db
 Vue.config.productionTip = false
 Vue.use(Element)
-/* eslint-disable no-new */
 new Vue({
   components: { App },
   router,
