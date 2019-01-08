@@ -16,15 +16,14 @@
   </div>
 </template>
 <script>
-import { ipcRenderer } from 'electron'
 export default {
   name: 'TitleBar',
   methods: {
     min () {
-      ipcRenderer.send('min-window')
+      this.$electron.ipcRenderer.send('min-window')
     },
     close () {
-      ipcRenderer.send('hide-window')
+      this.$electron.ipcRenderer.send('hide-window')
     }
   }
 }

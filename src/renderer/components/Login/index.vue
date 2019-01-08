@@ -10,7 +10,7 @@
     <webview
       ref="webview"
       class="login-webview"
-      src="http://live.bilibili.com/p/eden/rank#/childnav/vitality/0"
+      :src="loginSrc"
       :preload="preload"
     />
     <span
@@ -27,8 +27,8 @@
 </template>
 <script>
 import path from 'path'
-import { getUserInfo } from '../../api/login'
-import { addUser } from '../../utils/users-db'
+import { getUserInfo } from '@/api/user'
+import { addUser } from '@/utils/users-db'
 export default {
   name: 'LoginDialog',
   props: {
@@ -39,8 +39,9 @@ export default {
   },
   data () {
     return {
-      // preload: `file:${path.resolve(__dirname, './live.js')}`
-      preload: `file://${path.join(__static, '/live.js')}`
+      preload: `file://${path.join(__static, '/live.js')}`,
+      // loginSrc:'http://passport.bilibili.com/ajax/miniLogin/minilogin',
+      loginSrc: 'http://live.bilibili.com/p/eden/rank#/childnav/vitality/0'
     }
   },
   computed: {
@@ -61,23 +62,31 @@ export default {
       // 当页面加载的时候获取Cookie
       webview.addEventListener('dom-ready', () => {
         let session = webview.getWebContents().session
-        session.cookies.get({ url: 'http://live.bilibili.com' }, (err, cookies) => {
-          if (err) throw err
-          let cookieObj = {}
-          cookies.forEach(ele => {
-            cookieObj[ele.name] = ele.value
-          })
-          if (cookieObj.DedeUserID) { // DedeUserID 是 用户 uid
-            getUserInfo(cookieObj).then(res => {
-              const userInfo = res.data
-              addUser({ uid: cookieObj.DedeUserID, info: userInfo, cookie: cookieObj })
-              session.clearStorageData({
-                'storages': ['cookies']
-              })
-              webview.reload()
+        session.cookies.get(
+          { url: 'http://live.bilibili.com' },
+          (err, cookies) => {
+            if (err) throw err
+            let cookieObj = {}
+            cookies.forEach(ele => {
+              cookieObj[ele.name] = ele.value
             })
+            if (cookieObj.DedeUserID) {
+              // DedeUserID 是 用户 uid
+              getUserInfo(cookieObj).then(res => {
+                const userInfo = res.data
+                addUser({
+                  uid: cookieObj.DedeUserID,
+                  info: userInfo,
+                  cookie: cookieObj
+                })
+                session.clearStorageData({
+                  storages: ['cookies']
+                })
+                webview.reload()
+              })
+            }
           }
-        })
+        )
       })
     },
     // 重载
@@ -85,7 +94,6 @@ export default {
       const webview = this.$refs.webview
       webview.reload()
     }
-
   }
 }
 </script>
