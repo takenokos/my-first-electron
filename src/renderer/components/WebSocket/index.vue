@@ -18,6 +18,13 @@
           round
           @click="linkRoom"
         >连接</el-button>
+        <el-button
+          type="primary"
+          size="mini"
+          plain
+          round
+          @click="linkRoom"
+        >断开</el-button>
       </el-form-item>
       <el-form-item label="当前用户：">
         <!-- {{user.name}} -->
@@ -68,10 +75,12 @@ export default {
     return {
       roomId: null,
       messages: ['请先连接房间'],
-      WebSocket: null
+      WebSocket: null,
+      heartBeat: null // 心跳定时器
     }
   },
   destroyed () {
+    clearInterval(this.heartBeat)
     this.WebSocket = null
   },
   methods: {
@@ -92,17 +101,11 @@ export default {
       const _this = this
       // 进房请求
       ws.onopen = () => {
-        // ws.send(
-        //   encodeURIComponent(
-        //     JSON.stringify({
-        //       roomid: this.roomId
-        //     }),
-        //     7
-        //   )
-        // )
         this.sendData(7, JSON.stringify({ roomid: this.roomId }))
         // 之后发送心跳
-        this.heartBeat()
+        this.heartBeat = setInterval(() => {
+          this.sendData(2, '')
+        }, 30000)
       }
 
       // 接收
@@ -151,17 +154,8 @@ export default {
       ws.onclose = () => {
         ws.onopen = null
         ws.onmessage = null
-        clearInterval(this.hbI)
+        clearInterval(this.heartBeat)
       }
-    },
-    // 心跳
-    heartBeat () {
-      // 30s 心跳保持连接
-      setInterval(this.hbI, 30000)
-    },
-    // 心跳定时方法
-    hbI () {
-      this.sendData(2, '')
     },
     // 发送消息
     sendData (type, data) {
@@ -197,7 +191,7 @@ export default {
             }
           })
           if (data.op && data.op === 5) {
-            return this.getDanmuInfo(dataView, data)
+            resolve(this.getDanmuInfo(dataView, data))
           } else {
             resolve(data)
           }
@@ -227,6 +221,7 @@ export default {
           try {
             // console.log(bytes2str(recData))
             let body = JSON.parse(this.bytes2str(recData))
+            console.log(body)
             if (body.cmd === 'DANMU_MSG') {
               console.log(body.info[2][1], ':', body.info[1])
               self.fn.call(null, {
@@ -296,4 +291,3 @@ export default {
   font-size: 12px;
 }
 </style>
-
