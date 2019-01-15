@@ -20,9 +20,9 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 450,
+    height: 576,
     useContentSize: true,
-    width: 800,
+    width: 1024,
     frame: false, // 去除菜单
     fullscreenable: false, // 不可全屏
     // resizable: false, // 不可改变大小

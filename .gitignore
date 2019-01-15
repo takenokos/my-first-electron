@@ -10,3 +10,4 @@ npm-debug.log.*
 thumbs.db
 !.gitkeep
 src\renderer\user
+package-lock.json

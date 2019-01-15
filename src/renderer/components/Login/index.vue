@@ -4,14 +4,18 @@
     title="登陆"
     top="0"
     :visible.sync="dialogVisible"
-    :show-close="false"
     @opened="open"
   >
-    <webview
+    <!-- <webview
       ref="webview"
       class="login-webview"
       :src="loginSrc"
       :preload="preload"
+    /> -->
+    <webview
+      ref="webview"
+      class="login-webview"
+      :src="loginSrc"
     />
     <span
       slot="footer"
@@ -19,16 +23,21 @@
     >
       <el-button
         type="primary"
+        size="mini"
         @click="reloadWeb"
       >重载</el-button>
-      <el-button @click="dialogVisible = false">关闭</el-button>
+      <el-button
+        size="mini"
+        @click="dialogVisible = false"
+      >关闭</el-button>
     </span>
   </el-dialog>
 </template>
 <script>
-import path from 'path'
+// import path from 'path'
 import { getUserInfo } from '@/api/user'
 import { addUser } from '@/utils/users-db'
+const defaultSrc = 'http://passport.bilibili.com/ajax/miniLogin/minilogin'
 export default {
   name: 'LoginDialog',
   props: {
@@ -39,9 +48,9 @@ export default {
   },
   data () {
     return {
-      preload: `file://${path.join(__static, '/live.js')}`,
-      // loginSrc:'http://passport.bilibili.com/ajax/miniLogin/minilogin',
-      loginSrc: 'http://live.bilibili.com/p/eden/rank#/childnav/vitality/0'
+      // preload: `file://${path.join(__static, '/live.js')}`,
+      // loginSrc: 'http://live.bilibili.com/p/eden/rank#/childnav/vitality/0'
+      loginSrc: 'http://passport.bilibili.com/ajax/miniLogin/minilogin'
     }
   },
   computed: {
@@ -82,6 +91,7 @@ export default {
                 session.clearStorageData({
                   storages: ['cookies']
                 })
+                this.loginSrc = defaultSrc
                 webview.reload()
               })
             }
@@ -92,6 +102,7 @@ export default {
     // 重载
     reloadWeb () {
       const webview = this.$refs.webview
+      this.loginSrc = defaultSrc
       webview.reload()
     }
   }
@@ -105,11 +116,16 @@ export default {
   border-radius: 8px;
   overflow: hidden;
 }
-</style>
-
-<style scoped>
-.login-dialog >>> .el-dialog__body {
-  overflow: hidden;
-  padding: 0;
+.login-dialog {
+  & /deep/ .el-dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  & /deep/ .el-dialog__body {
+    overflow: hidden;
+    padding: 0;
+  }
 }
 </style>

@@ -4,13 +4,13 @@ const dbName = 'users'
 const userDb = db.get(dbName)
 // 读取全部的用户
 export function getUsers () {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     resolve(userDb.value())
   })
 }
 // 添加用户
 export function addUser (obj) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const val = userDb.find({ uid: obj.uid }).value()
     if (val) {
       Message({
@@ -30,7 +30,7 @@ export function addUser (obj) {
 }
 // 更新用户信息
 export function updateUser (obj) {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const val = userDb.find({ uid: obj.uid }).value()
     if (!val) {
       Message({
@@ -48,5 +48,17 @@ export function updateUser (obj) {
       })
       resolve()
     }
+  })
+}
+// 删除用户信息
+export function deleteUser (obj) {
+  return new Promise((resolve) => {
+    userDb
+      .remove({ uid: obj.uid }).write()
+    Message({
+      message: '用户已注销',
+      type: 'success'
+    })
+    resolve()
   })
 }
