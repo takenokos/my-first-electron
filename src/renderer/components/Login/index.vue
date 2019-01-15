@@ -14,6 +14,7 @@
     /> -->
     <webview
       ref="webview"
+      v-if="dialogVisible"
       class="login-webview"
       :src="loginSrc"
     />
@@ -25,7 +26,7 @@
         type="primary"
         size="mini"
         @click="reloadWeb"
-      >重载</el-button>
+      >刷新</el-button>
       <el-button
         size="mini"
         @click="dialogVisible = false"
@@ -37,7 +38,6 @@
 // import path from 'path'
 import { getUserInfo } from '@/api/user'
 import { addUser } from '@/utils/users-db'
-const defaultSrc = 'http://passport.bilibili.com/ajax/miniLogin/minilogin'
 export default {
   name: 'LoginDialog',
   props: {
@@ -91,8 +91,8 @@ export default {
                 session.clearStorageData({
                   storages: ['cookies']
                 })
-                this.loginSrc = defaultSrc
-                webview.reload()
+                // webview.reload()
+                this.dialogVisible = false
               })
             }
           }
@@ -101,9 +101,7 @@ export default {
     },
     // 重载
     reloadWeb () {
-      const webview = this.$refs.webview
-      this.loginSrc = defaultSrc
-      webview.reload()
+      this.$refs.webview.reload()
     }
   }
 }
