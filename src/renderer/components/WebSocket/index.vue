@@ -1,35 +1,31 @@
 <template>
   <div class="websocket">
-    <el-form
-      label-width="82px"
-      size="mini"
-    >
-      <el-form-item label="房间号：">
-        <el-input
-          style="width:92px;"
-          v-model.number="roomId"
-          size="mini"
-          placeholder="房间号"
-        />
-        <el-button
-          type="primary"
-          size="mini"
-          plain
-          round
-          @click="linkRoom"
-        >连接</el-button>
-        <el-button
-          type="primary"
-          size="mini"
-          plain
-          round
-          @click="linkRoom"
-        >断开</el-button>
-      </el-form-item>
-      <el-form-item label="当前用户：">
-        <!-- {{user.name}} -->
-      </el-form-item>
-    </el-form>
+    <div class="websocket-top">
+      <label>房间号：</label>
+      <el-input
+        style="width:120px;"
+        v-model.number="roomId"
+        size="mini"
+        placeholder="房间号"
+      />
+      <el-button
+        :disabled="isLink"
+        type="primary"
+        size="mini"
+        plain
+        round
+        @click="linkRoom"
+      >连接</el-button>
+      <el-button
+        :disabled="!isLink"
+        type="primary"
+        size="mini"
+        plain
+        round
+        @click="disconnectRoom"
+      >断开</el-button>
+    </div>
+    <div class="websocket-box">Main</div>
   </div>
 </template>
 <script>
@@ -73,8 +69,9 @@ export default {
   },
   data () {
     return {
+      isLink: false,
       roomId: null,
-      messages: ['请先连接房间'],
+      wsMessages: ['请先连接房间'],
       WebSocket: null,
       heartBeat: null // 心跳定时器
     }
@@ -84,6 +81,10 @@ export default {
     this.WebSocket = null
   },
   methods: {
+    // 关闭连接
+    disconnectRoom () {
+      this.WebSocket && this.WebSocket.close()
+    },
     // 连接房间 弹幕池
     linkRoom () {
       if (!this.roomId) {
@@ -112,64 +113,71 @@ export default {
       ws.onmessage = event => {
         _this.readBlob(event.data).then(res => {
           console.log(res)
+          // for (let i = 0; i < packets.length; ++i) {
+          switch (res.op) {
+            case 8: // 进房回应
+              this.isLink = true
+              this.$message({
+                type: 'success',
+                message: '连接成功'
+              })
+              break
+            case 3: // 心跳回应 会返回人气？
+              console.log('心跳：' + res)
+              break
+            case 5: // 弹幕消息
+              this.consoleWs(res.body)
+              break
+          }
         })
-        // const data = new DataView(event.data)
-        // console.log('data:' + data)
-        // const packets = decodeURIComponent(data)
-        // for (let i = 0; i < packets.length; ++i) {
-        //   const packet = packets[i]
-        //   switch (packet.op) {
-        //     case 8:
-        //       console.log('加入房间')
-        //       break
-        //     case 3:
-        //       // const count = decodeInt(packet.data)
-        //       // console.log(`人气：${count}`)
-        //       break
-        //     case 5:
-        //       // const body = decodeJson(packet.data)
-        //       // switch (body.cmd) {
-        //       //   case 'DANMU_MSG':
-        //       //     console.log(`${body.info[2][1]}: ${body.info[1]}`)
-        //       //     break
-        //       //   case 'SEND_GIFT':
-        //       //     console.log(
-        //       //       `${body.data.uname} ${body.data.action} ${body.data.num} 个 ${body.data.giftName}`
-        //       //     )
-        //       //     break
-        //       //   case 'WELCOME':
-        //       //     console.log(`欢迎 ${body.data.uname}`)
-        //       //     break
-        //       //   // 此处省略很多其他通知类型
-        //       //   default:
-        //       //     console.log(body)
-        //       // }
-        //       break
-        //     default:
-        //       console.log(packet)
-        //   }
-        // }
       }
       // 关闭
       ws.onclose = () => {
+        this.isLink = true
         ws.onopen = null
         ws.onmessage = null
         clearInterval(this.heartBeat)
+        this.$message({
+          type: 'info',
+          message: '断开连接'
+        })
+      }
+    },
+    // 接收的弹幕消息
+    consoleWs (body) {
+      // const body = decodeJson(packet.data)
+      switch (body.cmd) {
+        case 'DANMU_MSG':
+          console.log(`${body.info[2][1]}: ${body.info[1]}`)
+          break
+        case 'SEND_GIFT':
+          console.log(
+            `${body.data.uname} ${body.data.action} ${body.data.num} 个 ${
+              body.data.giftName
+            }`
+          )
+          break
+        case 'WELCOME':
+          console.log(`欢迎 ${body.data.uname}`)
+          break
+        // 此处省略很多其他通知类型
+        default:
+          console.log(body)
       }
     },
     // 发送消息
     sendData (type, data) {
       const totalLen = 16 + data.length
       const headLen = 16
+      const version = 1 // version ? 客户端版本？
+      const driver = 0 // driver ? 客户端设备？ 0|1
       const bufferData = Buffer.allocUnsafe(totalLen)
       bufferData.writeInt32BE(totalLen, 0)
       bufferData.writeInt16BE(headLen, 4)
-      // bufferData.writeInt16BE(version, 6)
+      bufferData.writeInt16BE(version, 6)
       bufferData.writeInt32BE(type, 8)
-      // bufferData.writeInt32BE(driver, 12)
+      bufferData.writeInt32BE(driver, 12)
       if (data) bufferData.write(data, headLen)
-      // if (this._protocol === 'socket' || this._protocol === 'flash') (<Socket>this._client).write(bufferData)
-      // else (<ws>this._client).send(bufferData)
       this.WebSocket.send(bufferData)
     },
     // 以下方法 参考 https://github.com/LeeeeeeM/bilibili-web-socket/blob/master/biWebSock.js
@@ -219,16 +227,7 @@ export default {
             recData.push(dataView.getUint8(i))
           }
           try {
-            // console.log(bytes2str(recData))
-            let body = JSON.parse(this.bytes2str(recData))
-            console.log(body)
-            if (body.cmd === 'DANMU_MSG') {
-              console.log(body.info[2][1], ':', body.info[1])
-              self.fn.call(null, {
-                name: body.info[2][1],
-                text: body.info[1]
-              })
-            }
+            const body = JSON.parse(this.bytes2str(recData))
             data.body.push(body)
           } catch (e) {
             // console.log('tcp 校验失败，重新发送')
@@ -238,7 +237,7 @@ export default {
         resolve(data)
       })
     },
-    // 处理字符串
+    // 处理字符串 接收的信息
     bytes2str (array) {
       let __array = array.slice(0)
       let j
@@ -283,11 +282,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .websocket {
-  .el-form-item {
-    margin-bottom: 0;
+  .websocket-top {
+    label {
+      font-size: 12px;
+    }
+    .el-input,
+    .el-button {
+      margin-left: 10px;
+    }
   }
-}
-.websocket /deep/ .el-form-item__label {
-  font-size: 12px;
 }
 </style>

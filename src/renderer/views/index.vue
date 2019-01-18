@@ -1,18 +1,19 @@
 <template>
   <div class="index-main">
-    <el-row
-      :gutter="20"
-      type="flex"
-    >
-      <el-col :span="16" />
-      <el-col :span="8">
-        <web-socket />
-      </el-col>
-    </el-row>
-    <!-- <el-button @click="addFile">测试写入文件</el-button>
+    <el-row type="flex">
+      <el-col :span="16">
+        <!-- <el-button @click="addFile">测试写入文件</el-button>
       <el-button @click="readFile">测试读取文件</el-button> -->
-    <el-button @click="loginDialogVisible=true">登陆</el-button>
-    <login-dialog :visible.sync="loginDialogVisible" />
+        <el-button @click="loginDialogVisible=true">登陆</el-button>
+      </el-col>
+      <el-col :span="8">
+        <div>
+          <web-socket />
+        </div>
+        <div>footer</div>
+      </el-col>
+      <login-dialog :visible.sync="loginDialogVisible" />
+    </el-row>
   </div>
 </template>
 <script>
@@ -42,3 +43,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.index-main {
+  height: 100%;
+}
+</style>

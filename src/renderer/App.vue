@@ -22,6 +22,7 @@ body,
 html {
   height: 100%;
   overflow: hidden;
+  color: #666;
 }
 * {
   padding: 0;
@@ -38,6 +39,7 @@ html {
     margin: 0 4px 4px 4px;
     padding: 4px;
     background-color: #eee;
+    overflow: hidden;
   }
 }
 </style>
