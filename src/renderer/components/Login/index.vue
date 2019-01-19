@@ -6,12 +6,6 @@
     :visible.sync="dialogVisible"
     @opened="open"
   >
-    <!-- <webview
-      ref="webview"
-      class="login-webview"
-      :src="loginSrc"
-      :preload="preload"
-    /> -->
     <webview
       ref="webview"
       v-if="dialogVisible"
@@ -35,7 +29,6 @@
   </el-dialog>
 </template>
 <script>
-// import path from 'path'
 import { getUserInfo } from '@/api/user'
 import { addUser } from '@/utils/users-db'
 export default {
@@ -48,8 +41,6 @@ export default {
   },
   data () {
     return {
-      // preload: `file://${path.join(__static, '/live.js')}`,
-      // loginSrc: 'http://live.bilibili.com/p/eden/rank#/childnav/vitality/0'
       loginSrc: 'http://passport.bilibili.com/ajax/miniLogin/minilogin'
     }
   },

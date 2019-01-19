@@ -21,11 +21,12 @@ function createWindow () {
    */
   mainWindow = new BrowserWindow({
     height: 576,
-    useContentSize: true,
     width: 1024,
+    useContentSize: true,
     frame: false, // 去除菜单
+    transparent: true, // 透明窗口
     fullscreenable: false, // 不可全屏
-    // resizable: false, // 不可改变大小
+    resizable: false, // 不可改变大小
     webPreferences: {
       webSecurity: false, // 设置跨域
       allowDisplayingInsecureContent: true, // 允许http资源

@@ -45,7 +45,14 @@ let rendererConfig = {
       },
       {
         test: /\.scss$/,
-        use: ['vue-style-loader', 'css-loader', 'sass-loader']
+        use: ['vue-style-loader', 'css-loader', 'sass-loader',
+          {
+            loader: 'sass-resources-loader',
+            options: {
+              resources: [path.join(__dirname, '../src/renderer/css/general.scss')]
+            }
+          }
+        ]
       },
       {
         test: /\.sass$/,

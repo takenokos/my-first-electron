@@ -17,7 +17,6 @@ export default {
 }
 </script>
 <style lang="scss">
-$bili-blue: #23ade5;
 body,
 html {
   height: 100%;

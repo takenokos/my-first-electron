@@ -3,7 +3,7 @@
     <div class="websocket-top">
       <label>房间号：</label>
       <el-input
-        style="width:120px;"
+        style="width:110px;"
         v-model.number="roomId"
         size="mini"
         placeholder="房间号"
@@ -282,6 +282,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .websocket {
+  display: flex;
+  flex-direction: column;
   .websocket-top {
     label {
       font-size: 12px;
@@ -290,6 +292,10 @@ export default {
     .el-button {
       margin-left: 10px;
     }
+  }
+  .websocket-box {
+    border: 1px solid $bili-blue;
+    border-radius: 5px;
   }
 }
 </style>
