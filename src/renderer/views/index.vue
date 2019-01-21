@@ -61,6 +61,7 @@ export default {
     background-color: #fff;
     .index-main__ws {
       height: 100%;
+      padding: 10px;
     }
   }
 }

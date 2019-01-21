@@ -29,7 +29,6 @@
   </el-dialog>
 </template>
 <script>
-import { getUserInfo } from '@/api/user'
 import { addUser } from '@/utils/users-db'
 export default {
   name: 'LoginDialog',
@@ -72,13 +71,7 @@ export default {
             })
             if (cookieObj.DedeUserID) {
               // DedeUserID 是 用户 uid
-              getUserInfo(cookieObj).then(res => {
-                const userInfo = res.data
-                addUser({
-                  uid: cookieObj.DedeUserID,
-                  info: userInfo,
-                  cookie: cookieObj
-                })
+              addUser(cookieObj).then(() => {
                 session.clearStorageData({
                   storages: ['cookies']
                 })
