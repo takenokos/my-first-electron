@@ -7,8 +7,8 @@
       :span="16"
       class="index-main__left"
     >
-      <!-- <el-button @click="addFile">测试写入文件</el-button>
-      <el-button @click="readFile">测试读取文件</el-button> -->
+      <!-- <el-button @click="addFile">测试写入文件</el-button> -->
+      <!-- <el-button @click="readFile">测试读取文件</el-button> -->
       <el-button @click="loginDialogVisible=true">登陆</el-button>
     </el-col>
     <el-col

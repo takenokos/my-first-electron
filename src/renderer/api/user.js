@@ -22,3 +22,14 @@ export function getUserInfo (cookieObj) {
     }
   })
 }
+// 用户心跳
+export function userHeartBeat (cookieObj) {
+  // setCookies(cookieObj)
+  // return request({
+  //   url: `https://api.live.bilibili.com/User/getUserInfo`,
+  //   method: 'get',
+  //   params: {
+  //     ts: new Date().getTime()
+  //   }
+  // })
+}

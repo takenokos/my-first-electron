@@ -2,7 +2,7 @@ import db from '../../db/index'
 import { Message } from 'element-ui'
 const dbName = 'users'
 const userDb = db.get(dbName)
-// 读取全部的用户
+// 读取全部的用户的uid
 export function getUsers () {
   return new Promise((resolve) => {
     resolve(userDb.value())
@@ -17,7 +17,11 @@ export function getUser (uid) {
 }
 // 添加用户
 export function addUser (cookieObj) {
-  const obj = Object.assign({ uid: parseInt(cookieObj.DedeUserID), enable: true }, cookieObj)
+  const obj = {
+    uid: parseInt(cookieObj.DedeUserID),
+    enable: true,
+    cookie: cookieObj
+  }
   return new Promise((resolve) => {
     const val = userDb.find({ uid: obj.uid }).value()
     if (val) {
@@ -70,4 +74,14 @@ export function deleteUser (uid) {
     })
     resolve()
   })
+}
+
+// 主用户的内容
+// 获取主用户id
+export function getMainUid () {
+  return Promise.resolve(db.get('main_uid'))
+}
+// 设置主用户id
+export function setMainUid (uid) {
+  db.set('main_uid', uid).write()
 }

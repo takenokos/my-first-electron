@@ -27,5 +27,8 @@ db._.mixin(LodashId)
 if (!db.has('users').value()) {
   db.set('users', []).write()
 }
+if (!db.has('main_uid').value()) {
+  db.set('main_uid', -1).write()
+}
 
 export default db

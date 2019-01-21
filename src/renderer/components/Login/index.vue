@@ -77,6 +77,7 @@ export default {
                 })
                 // webview.reload()
                 this.dialogVisible = false
+                this.$emit('success', cookieObj.DedeUserID)
               })
             }
           }
