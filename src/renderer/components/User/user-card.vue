@@ -5,12 +5,12 @@
       <div class="avatar"></div>
       <div>
         <p>
-          <span>{{user.uname}}</span><span>{{user.user_level}}</span>
+          <span>{{user.uname}}</span><span>{{user.user_level}}</span><span>{{user.uid}}</span>
         </p>
         <p>
-          <el-tooltip :content="`经验:${user.level_intimacy}/${user.next_level_intimacy}`">
+          <el-tooltip :content="`经验:${user.user_intimacy}/${user.user_next_intimacy}`">
             <el-progress
-              :percentage="user.level_intimacy/user.next_level_intimacy"
+              :percentage="percentage"
               show-text
             />
           </el-tooltip>
@@ -40,8 +40,17 @@ export default {
       dbUser: {}
     }
   },
-  created () {
-    this.getCookie()
+  computed: {
+    percentage () {
+      return this.user.user_intimacy
+        ? (this.user.user_intimacy / this.user.user_next_intimacy) * 100
+        : 0
+    }
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.getCookie()
+    })
   },
   methods: {
     // db数据

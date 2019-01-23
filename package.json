@@ -64,8 +64,6 @@
     "axios": "^0.18.0",
     "element-ui": "^2.4.11",
     "fs-extra": "^7.0.1",
-    "js-cookie": "^2.2.0",
-    "lodash-id": "^0.14.0",
     "lowdb": "^1.0.0",
     "node-sass": "^4.11.0",
     "sass-resources-loader": "^2.0.0",

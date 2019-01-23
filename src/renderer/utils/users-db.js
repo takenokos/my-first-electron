@@ -5,7 +5,7 @@ const userDb = db.get(dbName)
 // 读取全部的用户的uid
 export function getUsers () {
   return new Promise((resolve) => {
-    resolve(userDb.value())
+    resolve(userDb.map('uid').value())
   })
 }
 // 读取一个用户
@@ -16,12 +16,7 @@ export function getUser (uid) {
   })
 }
 // 添加用户
-export function addUser (cookieObj) {
-  const obj = {
-    uid: parseInt(cookieObj.DedeUserID),
-    enable: true,
-    cookie: cookieObj
-  }
+export function addUser (obj) {
   return new Promise((resolve) => {
     const val = userDb.find({ uid: obj.uid }).value()
     if (val) {

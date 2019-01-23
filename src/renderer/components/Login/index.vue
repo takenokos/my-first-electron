@@ -71,7 +71,12 @@ export default {
             })
             if (cookieObj.DedeUserID) {
               // DedeUserID 是 用户 uid
-              addUser(cookieObj).then(() => {
+              const obj = {
+                uid: parseInt(cookieObj.DedeUserID),
+                enable: true,
+                cookie: cookieObj
+              }
+              addUser(obj).then(() => {
                 session.clearStorageData({
                   storages: ['cookies']
                 })

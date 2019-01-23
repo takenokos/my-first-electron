@@ -1,5 +1,4 @@
 import Datastore from 'lowdb'
-import LodashId from 'lodash-id'
 import FileSync from 'lowdb/adapters/FileSync'
 import path from 'path'
 import fs from 'fs-extra'
@@ -22,7 +21,6 @@ if (!fs.pathExistsSync(STORE_PATH)) { // 目录不存在则创建
 const adapter = new FileSync(path.join(STORE_PATH, '/data.json')) // db 的json 文件
 
 const db = Datastore(adapter)
-db._.mixin(LodashId)
 
 if (!db.has('users').value()) {
   db.set('users', []).write()

@@ -10,6 +10,7 @@
       <!-- <el-button @click="addFile">测试写入文件</el-button> -->
       <!-- <el-button @click="readFile">测试读取文件</el-button> -->
       <el-button @click="loginDialogVisible=true">登陆</el-button>
+      <users />
     </el-col>
     <el-col
       :span="8"
@@ -22,14 +23,15 @@
   </el-row>
 </template>
 <script>
-import { getUsers } from '@/utils/users-db.js'
 import LoginDialog from '@/components/Login/index'
 import WebSocket from '@/components/WebSocket/index'
+import Users from '@/components/User/index'
 export default {
   name: 'index',
   components: {
     LoginDialog,
-    WebSocket
+    WebSocket,
+    Users
   },
   data () {
     return {
@@ -39,11 +41,6 @@ export default {
   methods: {
     addFile () {
       // addUser('test', { 'test': 'test' })
-    },
-    readFile () {
-      getUsers().then(data => {
-        console.log(data)
-      })
     }
   }
 }
