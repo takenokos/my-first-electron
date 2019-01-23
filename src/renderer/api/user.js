@@ -5,9 +5,8 @@ const BiliApi = 'https://api.live.bilibili.com'
 // 设置用户的cookie
 function setCookies (cookieObj) {
   for (const key in cookieObj) {
-    const c = { url: BiliApi, name: key, value: cookieObj[key] }
-    console.log(c)
-    ipcRenderer.send('set-cookie', c)
+    const cookie = { url: BiliApi, name: key, value: cookieObj[key] }
+    ipcRenderer.send('set-cookie', cookie)
   }
 }
 // 获取用户信息

@@ -55,9 +55,8 @@ function createWindow () {
   // 自定义sesssion cookie
   // const Cookies = session.fromPartition('persist:name').cookies
   const Cookies = session.defaultSession.cookies
-  ipcMain.on('set-cookie', (event, arg) => {
-    console.log(arg)
-    Cookies.set(arg, (error) => {
+  ipcMain.on('set-cookie', (event, cookie) => {
+    Cookies.set(cookie, (error) => {
       if (error) console.error(error)
     })
   })
