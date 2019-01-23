@@ -11,7 +11,7 @@
           <el-tooltip :content="`经验:${user.user_intimacy}/${user.user_next_intimacy}`">
             <el-progress
               :percentage="percentage"
-              show-text
+              text-inside
             />
           </el-tooltip>
         </p>
@@ -43,7 +43,12 @@ export default {
   computed: {
     percentage () {
       return this.user.user_intimacy
-        ? (this.user.user_intimacy / this.user.user_next_intimacy) * 100
+        ? parseFloat(
+          (
+            (this.user.user_intimacy / this.user.user_next_intimacy) *
+              100
+          ).toFixed(2)
+        )
         : 0
     }
   },
