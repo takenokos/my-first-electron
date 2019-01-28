@@ -57,7 +57,7 @@ function createWindow () {
   const Cookies = session.defaultSession.cookies
   ipcMain.on('set-cookie', (event, cookie) => {
     Cookies.set(cookie, (error) => {
-      if (error) console.error(error)
+      if (error) console.error(error, cookie)
     })
   })
 
@@ -74,10 +74,6 @@ function createWindow () {
     tray.setHighlightMode('never')
   })
   // 系统托盘
-  // const tray = new Tray(path.join(__dirname, '../../build/icons/icon.ico'))
-  // const trayIcon = path.join(__dirname, 'build/icons/icon.ico')
-  // const tray = new Tray(nativeImage.createFromPath(trayIcon))
-  // const tray = new Tray(trayIcon)
   const trayIcon = `${__static}/icon.ico`
   const tray = new Tray(trayIcon)
   const contextMenu = Menu.buildFromTemplate([

@@ -1,13 +1,15 @@
 <template>
   <el-progress
+    :percentage="(tick/dTick)*100"
+    :width="100"
     type="circle"
-    :percentage="tick/dTick"
     status="text"
-  >{{time}}</el-progress>
+    title="心跳计时"
+    color="#23ade5"
+  ><span class="heart-time">{{time}}</span></el-progress>
 </template>
 <script>
 import { userHeartBeat } from '@/api/user'
-import { setTimeout } from 'timers'
 const defaultTick = 300 // 5*60=5m=300s
 export default {
   name: 'HeartBeat',
@@ -33,7 +35,7 @@ export default {
       userHeartBeat(this.cookie).then(res => {
         this.$emit('heart-beat')
         this.tick = defaultTick
-        return this.timeTick()
+        this.timeTick()
       })
     },
     // 定时器
@@ -56,4 +58,8 @@ export default {
   }
 }
 </script>
-
+<style lang="scss" scoped>
+.heart-time {
+  font-size: 18px;
+}
+</style>

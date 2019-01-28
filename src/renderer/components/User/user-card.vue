@@ -1,77 +1,117 @@
 <template>
-  <el-card shadow="hover">
-    <a class="logout-text">登出</a>
-    <div class="user-info">
-      <div class="avatar"></div>
-      <div>
-        <p>
-          <span>{{user.uname}}</span><span>{{user.user_level}}</span><span>{{user.uid}}</span>
-        </p>
-        <p>
-          <el-tooltip :content="`经验:${user.user_intimacy}/${user.user_next_intimacy}`">
-            <el-progress
-              :percentage="percentage"
-              text-inside
-            />
-          </el-tooltip>
-        </p>
+  <el-card
+    shadow="hover"
+    class="user-card"
+  >
+    <div
+      slot="header"
+      class="user-card__header"
+    >
+      <el-button
+        type="text"
+        size="mini"
+        class="logout-text"
+        @click="logout"
+      >{{user.enable?'登出':'删除'}}</el-button>
+      <div class="user-info">
+        <span
+          :style="{'background-image':`url(${info.face})`}"
+          class="user-info__avatar"
+        />
+        <div class="info">
+          <p>
+            <span>{{info.uname}}</span>
+            <span class="user-info__ul">{{info.user_level}}</span>
+          </p>
+          <p>
+            UID:{{info.uid}}
+          </p>
+        </div>
       </div>
+      <el-tooltip
+        :content="`经验:${info.user_intimacy}/${info.user_next_intimacy}`"
+        placement="top"
+      >
+        <el-progress :percentage="percentage" />
+      </el-tooltip>
+    </div>
+    <div class="user-operate">
+      <heart-beat :cookie="cookie" />
     </div>
   </el-card>
 </template>
 <script>
-import { getUser } from '@/utils/users-db'
-import { getUserInfo } from '@/api/user'
 import HeartBeat from './heat-beat'
 export default {
   name: 'UserCard',
   props: {
-    uid: {
-      type: Number,
-      required: true
+    user: {
+      type: Object,
+      required: () => {}
     }
   },
   components: {
     HeartBeat
   },
-  data () {
-    return {
-      user: {},
-      dbUser: {}
-    }
-  },
   computed: {
+    info () {
+      return this.user.info
+    },
+    cookie () {
+      return this.user.cookie
+    },
     percentage () {
-      return this.user.user_intimacy
+      return this.info.user_intimacy
         ? parseFloat(
           (
-            (this.user.user_intimacy / this.user.user_next_intimacy) *
+            (this.info.user_intimacy / this.info.user_next_intimacy) *
               100
           ).toFixed(2)
         )
         : 0
     }
   },
-  mounted () {
-    this.$nextTick(() => {
-      this.getCookie()
-    })
-  },
   methods: {
-    // db数据
-    getCookie () {
-      getUser(this.uid).then(data => {
-        this.dbUser = data
-        return this.getUserInfo()
-      })
-    },
-    // api 获取远端用户信息
-    getUserInfo () {
-      getUserInfo(this.dbUser.cookie).then(res => {
-        this.user = res.data
-      })
+    logout () {
+      this.$store.dispatch('deleteUser', this.user.uid)
     }
   }
 }
 </script>
-
+<style lang="scss" scoped>
+.user-card {
+  display: inline-block;
+  position: relative;
+  .logout-text {
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    padding: 0;
+    color: $bili-danger;
+  }
+  .user-info {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    .user-info__avatar {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background-size: 100%;
+      border-radius: 50%;
+      border: 1px solid $bili-blue;
+      margin-right: 20px;
+    }
+    .user-info__ul {
+      background-color: $bili-ty;
+      color: #fff;
+      padding: 0 6px;
+      border-radius: 2px;
+      font-size: 12px;
+    }
+  }
+  .user-operate {
+    text-align: center;
+  }
+}
+</style>

@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 import { ipcRenderer } from 'electron'
-
 const BiliApi = 'https://api.live.bilibili.com'
+// const BiliApi = ''
 // 设置用户的cookie
 function setCookies (cookieObj) {
   for (const key in cookieObj) {
@@ -10,9 +10,9 @@ function setCookies (cookieObj) {
   }
 }
 // 获取用户信息
-export function getUserInfo (cookieObj) {
+export async function getUserInfo (cookieObj) {
   // 先设置需要传递的用户cookie
-  setCookies(cookieObj)
+  await setCookies(cookieObj)
   return request({
     url: `${BiliApi}/User/getUserInfo`,
     method: 'get',
@@ -22,8 +22,8 @@ export function getUserInfo (cookieObj) {
   })
 }
 // 用户心跳
-export function userHeartBeat (cookieObj) {
-  setCookies(cookieObj)
+export async function userHeartBeat (cookieObj) {
+  await setCookies(cookieObj)
   return request({
     url: `${BiliApi}/User/userOnlineHeart`,
     method: 'get'

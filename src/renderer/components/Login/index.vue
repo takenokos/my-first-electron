@@ -29,7 +29,6 @@
   </el-dialog>
 </template>
 <script>
-import { addUser } from '@/utils/users-db'
 export default {
   name: 'LoginDialog',
   props: {
@@ -63,7 +62,7 @@ export default {
         let session = webview.getWebContents().session
         session.cookies.get(
           { url: 'http://live.bilibili.com' },
-          (err, cookies) => {
+          async (err, cookies) => {
             if (err) throw err
             let cookieObj = {}
             cookies.forEach(ele => {
@@ -71,19 +70,12 @@ export default {
             })
             if (cookieObj.DedeUserID) {
               // DedeUserID 是 用户 uid
-              const obj = {
-                uid: parseInt(cookieObj.DedeUserID),
-                enable: true,
-                cookie: cookieObj
-              }
-              addUser(obj).then(() => {
-                session.clearStorageData({
-                  storages: ['cookies']
-                })
-                // webview.reload()
-                this.dialogVisible = false
-                this.$emit('success', cookieObj.DedeUserID)
+              await this.$store.dispatch('addUser', cookieObj)
+              session.clearStorageData({
+                storages: ['cookies']
               })
+              // webview.reload()
+              this.dialogVisible = false
             }
           }
         )

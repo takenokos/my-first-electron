@@ -1,14 +1,14 @@
 <template>
-  <div class="users">
+  <el-scrollbar class="users">
     <user-card
       v-for="item in users"
-      :key="item"
-      :uid="item"
+      :key="item.uid"
+      :user="item"
+      class="users__card"
     />
-  </div>
+  </el-scrollbar>
 </template>
 <script>
-import { getUsers } from '@/utils/users-db.js'
 import UserCard from './user-card'
 export default {
   name: 'Users',
@@ -16,8 +16,11 @@ export default {
     UserCard
   },
   data () {
-    return {
-      users: []
+    return {}
+  },
+  computed: {
+    users () {
+      return this.$store.getters.users
     }
   },
   created () {
@@ -25,10 +28,16 @@ export default {
   },
   methods: {
     getUsers () {
-      getUsers().then(data => {
-        this.users = data
-      })
+      this.$store.dispatch('getUsers')
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.users {
+  height: 100%;
+  .users__card {
+    margin: 6px;
+  }
+}
+</style>
