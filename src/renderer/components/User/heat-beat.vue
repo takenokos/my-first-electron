@@ -27,7 +27,7 @@ export default {
     }
   },
   mounted () {
-    this.heartBeat()
+    this.timeTick()
   },
   methods: {
     // 心跳 5m 5*60*1000
