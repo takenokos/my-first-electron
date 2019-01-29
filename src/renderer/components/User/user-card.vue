@@ -2,6 +2,7 @@
   <el-card
     shadow="hover"
     class="user-card"
+    :class="{'user-danger':!user.enable}"
   >
     <div
       slot="header"
@@ -112,6 +113,12 @@ export default {
   }
   .user-operate {
     text-align: center;
+  }
+}
+.user-danger {
+  box-shadow: 0 2px 12px 0 $bili-danger;
+  &:hover {
+    box-shadow: 0 2px 12px 0 $bili-danger;
   }
 }
 </style>

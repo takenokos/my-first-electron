@@ -34,7 +34,11 @@ const actions = {
     if (data.length <= 0) {
       return
     }
-    const item = data[0]
+    let item = data[0]
+    if (!item.enable) {
+      dispatch('addTo', { user: item, data })
+      return
+    }
     const cookie = item.cookie
     getUserInfo(cookie).then(res => {
       const user = Object.assign({}, item, { info: res.data })
@@ -43,7 +47,19 @@ const actions = {
       setTimeout(() => { // 1s延迟加载，保证cookie的正常
         dispatch('getUserInfo', data)
       }, 1000)
+      dispatch('addTo', { user, data })
+    }).catch(() => { // 接口返回出错 cookie 无效
+      item.enable = false
+      dispatch('addTo', { user: item, data })
     })
+  },
+  // 添加进vuex
+  addTo ({ dispatch, commit }, { user, data }) {
+    commit('ADD_USER', user)
+    data.shift() // 删除第一个
+    setTimeout(() => { // 1s延迟加载，保证cookie的正常
+      dispatch('getUserInfo', data)
+    }, 1000)
   },
   // 添加用户 登陆
   addUser ({ commit }, cookie) {
@@ -53,10 +69,13 @@ const actions = {
       cookie
     }
     addUser(obj).then(() => {
-      getUserInfo(cookie).then(res => {
-        const user = Object.assign({}, obj, { info: res.data })
-        commit('ADD_USER', user)
-      })
+      setTimeout(() => { // 1s延迟加载，保证cookie的正常
+        // dispatch('getUserInfo', [obj])
+        getUserInfo(cookie).then(res => {
+          const user = Object.assign({}, obj, { info: res.data })
+          commit('ADD_USER', user)
+        })
+      }, 1000)
     })
   },
   // 删除用户 登出
