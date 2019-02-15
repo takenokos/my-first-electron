@@ -1,4 +1,5 @@
 import request from '@/utils/request'
+// import Cookie from 'js-cookie'
 import { ipcRenderer } from 'electron'
 const BiliApi = 'https://api.live.bilibili.com'
 // const BiliApi = ''
@@ -7,6 +8,7 @@ function setCookies (cookieObj) {
   for (const key in cookieObj) {
     const cookie = { url: BiliApi, name: key, value: cookieObj[key] }
     ipcRenderer.send('set-cookie', cookie)
+    // Cookie.set(key, cookieObj[key])
   }
 }
 // 获取用户信息

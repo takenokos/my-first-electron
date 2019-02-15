@@ -43,10 +43,6 @@ const actions = {
     getUserInfo(cookie).then(res => {
       const user = Object.assign({}, item, { info: res.data })
       commit('ADD_USER', user)
-      data.shift() // 删除第一个
-      setTimeout(() => { // 1s延迟加载，保证cookie的正常
-        dispatch('getUserInfo', data)
-      }, 1000)
       dispatch('addTo', { user, data })
     }).catch(() => { // 接口返回出错 cookie 无效
       item.enable = false
