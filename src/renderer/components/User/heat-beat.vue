@@ -14,6 +14,14 @@ const defaultTick = 300 // 5*60=5m=300s
 export default {
   name: 'HeartBeat',
   props: {
+    uid: {
+      type: Number,
+      default: 0
+    },
+    enable: {
+      type: Boolean,
+      default: false
+    },
     cookie: {
       type: Object,
       default: () => {}
@@ -27,16 +35,31 @@ export default {
     }
   },
   mounted () {
+    if (!this.enable) {
+      this.time = '失效'
+      return
+    }
     this.timeTick()
   },
   methods: {
     // 心跳 5m 5*60*1000
     heartBeat () {
-      userHeartBeat(this.cookie).then(res => {
-        this.$emit('heart-beat')
-        this.tick = defaultTick
-        this.timeTick()
-      })
+      if (!this.enable) {
+        return
+      }
+      userHeartBeat(this.cookie)
+        .then(res => {
+          if (res.code !== 0) {
+            this.setUserEnable()
+            return
+          }
+          this.$emit('heart-beat')
+          this.tick = defaultTick
+          this.timeTick()
+        })
+        .catch(() => {
+          this.setUserEnable()
+        })
     },
     // 定时器
     timeTick () {
@@ -54,6 +77,14 @@ export default {
         this.tick--
         this.timeTick()
       }, 1000)
+    },
+    // 用户信息失效处理
+    setUserEnable () {
+      this.time = '失效'
+      this.$store.dispatch('updateUser', {
+        uid: this.uid,
+        enable: false
+      })
     }
   }
 }

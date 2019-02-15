@@ -39,7 +39,7 @@ export function addUser (obj) {
     }
   })
 }
-// 更新用户信息
+// 更新用户信息 全部的
 export function updateUser (obj) {
   return new Promise((resolve) => {
     const val = userDb().find({ uid: obj.uid }).value()

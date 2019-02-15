@@ -1,8 +1,9 @@
 
-import { getUsers, addUser, deleteUser } from '@/utils/users-db.js'
+import { getUsers, addUser, deleteUser, updateUser } from '@/utils/users-db.js'
 import { getUserInfo } from '@/api/user'
 const state = {
-  users: []
+  users: [],
+  main_uid: -1
 }
 
 const mutations = {
@@ -19,10 +20,24 @@ const mutations = {
   DELETE_USER (state, uid) {
     const index = state.users.findIndex(obj => obj.uid === uid)
     index > -1 && state.users.splice(index, 1)
+  },
+  // 更新用户
+  UPDATE_USER (state, obj) {
+    let user = state.users.find(item => item.uid === obj.uid)
+    if (user) {
+      Object.keys(obj).forEach(key => {
+        user[key] = obj[key]
+      })
+    }
+  },
+  // 主用户
+  SET_MAIN_UID (state, uid) {
+    state.main_uid = uid
   }
 }
 
 const actions = {
+  // 获取全部用户
   async getUsers ({ dispatch, commit }) {
     commit('CLEAR_USERS')
     getUsers().then(data => {
@@ -39,9 +54,15 @@ const actions = {
       dispatch('addTo', { user: item, data })
       return
     }
+    if (!item.enable) {
+      commit('ADD_USER', item)
+      dispatch('addTo', { item, data })
+      return
+    }
     const cookie = item.cookie
     getUserInfo(cookie).then(res => {
       const user = Object.assign({}, item, { info: res.data })
+      updateUser(user)
       commit('ADD_USER', user)
       dispatch('addTo', { user, data })
     }).catch(() => { // 接口返回出错 cookie 无效
@@ -64,25 +85,30 @@ const actions = {
       enable: true,
       cookie
     }
-    addUser(obj).then(() => {
-      setTimeout(() => { // 1s延迟加载，保证cookie的正常
-        // dispatch('getUserInfo', [obj])
-        getUserInfo(cookie).then(res => {
-          const user = Object.assign({}, obj, { info: res.data })
-          commit('ADD_USER', user)
-        })
-      }, 1000)
-    })
+    setTimeout(() => { // 1s延迟加载，保证cookie的正常
+      // dispatch('getUserInfo', [obj])
+      getUserInfo(cookie).then(res => {
+        const user = Object.assign({}, obj, { info: res.data })
+        addUser(user)
+        commit('ADD_USER', user)
+      })
+    }, 1000)
   },
   // 删除用户 登出
   deleteUser ({ commit }, uid) {
     deleteUser(uid).then(() => {
       commit('DELETE_USER', uid)
     })
+  },
+  // 更新用户
+  updateUser ({ commit }, obj) {
+    updateUser(obj)
+    commit('UPDATE_USER', obj)
   }
 }
 const getters = {
-  users: state => state.users
+  users: state => state.users,
+  mainuser: state => state.users.find(item => item.uid === state.main_uid)
 }
 
 export default {

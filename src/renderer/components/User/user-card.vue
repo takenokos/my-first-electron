@@ -1,8 +1,8 @@
 <template>
   <el-card
-    shadow="hover"
-    class="user-card"
+    :shadow="`${user.enable?'hover':'always'}`"
     :class="{'user-danger':!user.enable}"
+    class="user-card"
   >
     <div
       slot="header"
@@ -37,7 +37,11 @@
       </el-tooltip>
     </div>
     <div class="user-operate">
-      <heart-beat :cookie="cookie" />
+      <heart-beat
+        :uid="user.uid"
+        :enable="user.enable"
+        :cookie="cookie"
+      />
     </div>
   </el-card>
 </template>
