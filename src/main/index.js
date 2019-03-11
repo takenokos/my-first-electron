@@ -52,6 +52,7 @@ function createWindow () {
   ipcMain.on('min-window', () => {
     mainWindow.minimize()
   })
+
   // 禁止直接关闭 ?是否需要 已自定义窗口
   mainWindow.on('close', (event) => {
     mainWindow.hide()
@@ -65,10 +66,6 @@ function createWindow () {
     tray.setHighlightMode('never')
   })
   // 系统托盘
-  // const tray = new Tray(path.join(__dirname, '../../build/icons/icon.ico'))
-  // const trayIcon = path.join(__dirname, 'build/icons/icon.ico')
-  // const tray = new Tray(nativeImage.createFromPath(trayIcon))
-  // const tray = new Tray(trayIcon)
   const trayIcon = `${__static}/icon.ico`
   const tray = new Tray(trayIcon)
   const contextMenu = Menu.buildFromTemplate([

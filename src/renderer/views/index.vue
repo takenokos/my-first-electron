@@ -7,43 +7,35 @@
       :span="16"
       class="index-main__left"
     >
-      <!-- <el-button @click="addFile">测试写入文件</el-button> -->
-      <!-- <el-button @click="readFile">测试读取文件</el-button> -->
       <el-button @click="loginDialogVisible=true">登陆</el-button>
+      <users />
     </el-col>
     <el-col
       :span="8"
       class="index-main__right"
     >
       <web-socket class="index-main__ws" />
-      <div class="index-main__send">footer</div>
+      <socket-send class="index-main__send" />
     </el-col>
     <login-dialog :visible.sync="loginDialogVisible" />
   </el-row>
 </template>
 <script>
-import { getUsers } from '@/utils/users-db.js'
 import LoginDialog from '@/components/Login/index'
 import WebSocket from '@/components/WebSocket/index'
+import SocketSend from '@/components/WebSocket/send'
+import Users from '@/components/User/index'
 export default {
   name: 'index',
   components: {
     LoginDialog,
-    WebSocket
+    WebSocket,
+    SocketSend,
+    Users
   },
   data () {
     return {
       loginDialogVisible: false
-    }
-  },
-  methods: {
-    addFile () {
-      // addUser('test', { 'test': 'test' })
-    },
-    readFile () {
-      getUsers().then(data => {
-        console.log(data)
-      })
     }
   }
 }
@@ -61,6 +53,9 @@ export default {
     background-color: #fff;
     .index-main__ws {
       height: 100%;
+      padding: 10px;
+    }
+    .index-main__send {
       padding: 10px;
     }
   }

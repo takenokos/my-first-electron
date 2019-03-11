@@ -1,0 +1,65 @@
+<template>
+  <div class="ws-send">
+    <el-input
+      type="textarea"
+      v-model="text"
+      clearable
+      :rows="3"
+      resize="none"
+      placeholder="请输入弹幕内容desu~"
+      :maxlength="maxlength"
+      @keyup.enter.native="send"
+    />
+    <el-row
+      :gutter="20"
+      type="flex"
+      justify="space-between"
+      class="after-text"
+    >
+      <el-col :span="6">
+        <el-tooltip :content="`uname && uid`">
+          <img
+            width="30"
+            height="30"
+          />
+        </el-tooltip>
+      </el-col>
+      <el-col :span="6">
+        <el-button
+          type="primary"
+          size="mini"
+          @click="send"
+        >发送</el-button>
+      </el-col>
+    </el-row>
+  </div>
+</template>
+<script>
+export default {
+  name: 'SocketSend',
+  data () {
+    return {
+      maxlength: 30,
+      text: ''
+    }
+  },
+  computed: {
+    user () {
+      return this.$store.getters.mainuser
+    }
+  },
+  methods: {
+    // 弹幕发送的方法
+    send () {
+      this.text = ''
+    }
+  }
+}
+</script>
+<style lang="scss" scoped>
+.ws-send {
+  .after-text {
+    margin-top: 10px;
+  }
+}
+</style>
