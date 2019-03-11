@@ -1,33 +1,20 @@
-import request from '@/utils/request'
-// import Cookie from 'js-cookie'
-import { ipcRenderer } from 'electron'
-const BiliApi = 'https://api.live.bilibili.com'
-// const BiliApi = ''
-// 设置用户的cookie
-function setCookies (cookieObj) {
-  for (const key in cookieObj) {
-    const cookie = { url: BiliApi, name: key, value: cookieObj[key] }
-    ipcRenderer.send('set-cookie', cookie)
-    // Cookie.set(key, cookieObj[key])
-  }
-}
+import request from '@/utils/https'
 // 获取用户信息
-export async function getUserInfo (cookieObj) {
-  // 先设置需要传递的用户cookie
-  await setCookies(cookieObj)
+export function getUserInfo (cookieObj) {
   return request({
-    url: `${BiliApi}/User/getUserInfo`,
+    url: '/xlive/web-ucenter/user/get_user_info',
     method: 'get',
     params: {
       ts: new Date().getTime()
-    }
+    },
+    cookie: cookieObj
   })
 }
 // 用户心跳
-export async function userHeartBeat (cookieObj) {
-  await setCookies(cookieObj)
+export function userHeartBeat (cookieObj) {
   return request({
-    url: `${BiliApi}/User/userOnlineHeart`,
-    method: 'get'
+    url: '/User/userOnlineHeart',
+    method: 'get',
+    cookie: cookieObj
   })
 }

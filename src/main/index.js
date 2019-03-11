@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow, ipcMain, Tray, Menu, session } from 'electron'
+import { app, BrowserWindow, ipcMain, Tray, Menu } from 'electron'
 import path from 'path'
 /**
  * Set `__static` path to static files in production
@@ -51,14 +51,6 @@ function createWindow () {
   // 最小化
   ipcMain.on('min-window', () => {
     mainWindow.minimize()
-  })
-  // 自定义sesssion cookie
-  // const Cookies = session.fromPartition('persist:name').cookies
-  const Cookies = session.defaultSession.cookies
-  ipcMain.on('set-cookie', (event, cookie) => {
-    Cookies.set(cookie, (error) => {
-      if (error) console.error(error, cookie)
-    })
   })
 
   // 禁止直接关闭 ?是否需要 已自定义窗口

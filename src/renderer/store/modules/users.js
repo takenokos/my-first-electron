@@ -54,19 +54,14 @@ const actions = {
       dispatch('addTo', { user: item, data })
       return
     }
-    if (!item.enable) {
-      commit('ADD_USER', item)
-      dispatch('addTo', { item, data })
-      return
-    }
     const cookie = item.cookie
     getUserInfo(cookie).then(res => {
       const user = Object.assign({}, item, { info: res.data })
       updateUser(user)
-      commit('ADD_USER', user)
       dispatch('addTo', { user, data })
     }).catch(() => { // 接口返回出错 cookie 无效
       item.enable = false
+      updateUser(item)
       dispatch('addTo', { user: item, data })
     })
   },
@@ -74,9 +69,7 @@ const actions = {
   addTo ({ dispatch, commit }, { user, data }) {
     commit('ADD_USER', user)
     data.shift() // 删除第一个
-    setTimeout(() => { // 1s延迟加载，保证cookie的正常
-      dispatch('getUserInfo', data)
-    }, 1000)
+    dispatch('getUserInfo', data)
   },
   // 添加用户 登陆
   addUser ({ commit }, cookie) {
@@ -85,14 +78,11 @@ const actions = {
       enable: true,
       cookie
     }
-    setTimeout(() => { // 1s延迟加载，保证cookie的正常
-      // dispatch('getUserInfo', [obj])
-      getUserInfo(cookie).then(res => {
-        const user = Object.assign({}, obj, { info: res.data })
-        addUser(user)
-        commit('ADD_USER', user)
-      })
-    }, 1000)
+    getUserInfo(cookie).then(res => {
+      const user = Object.assign({}, obj, { info: res.data })
+      addUser(user)
+      commit('ADD_USER', user)
+    })
   },
   // 删除用户 登出
   deleteUser ({ commit }, uid) {
