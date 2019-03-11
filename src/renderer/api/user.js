@@ -4,9 +4,6 @@ export function getUserInfo (cookieObj) {
   return request({
     url: '/xlive/web-ucenter/user/get_user_info',
     method: 'get',
-    params: {
-      ts: new Date().getTime()
-    },
     cookie: cookieObj
   })
 }
