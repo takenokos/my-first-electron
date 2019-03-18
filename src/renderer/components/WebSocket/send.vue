@@ -17,10 +17,11 @@
       class="after-text"
     >
       <el-col :span="6">
-        <el-tooltip :content="`uname && uid`">
+        <el-tooltip :content="content">
           <img
-            width="30"
-            height="30"
+            class="main-user"
+            :src="avatar"
+            draggable="false"
           />
         </el-tooltip>
       </el-col>
@@ -45,12 +46,36 @@ export default {
   },
   computed: {
     user () {
-      return this.$store.getters.mainuser
+      return this.$store.getters.mainUser
+    },
+    avatar () {
+      return this.user
+        ? this.user.info.face
+        : 'http://static.hdslb.com/images/akari.jpg'
+    },
+    uname () {
+      return this.user ? this.user.info.uname : ''
+    },
+    uid () {
+      return this.user ? this.user.uid : ''
+    },
+    content () {
+      return this.user ? `${this.uname} \n ${this.uid}` : '请选择主用户DA☆ZE~'
     }
+  },
+  created () {
+    this.$store.dispatch('getMainUser')
   },
   methods: {
     // 弹幕发送的方法
     send () {
+      if (!this.user || !this.user.enable) {
+        this.$message({
+          type: 'warning',
+          message: '请选择主用户DA☆ZE~'
+        })
+        return
+      }
       this.text = ''
     }
   }
@@ -60,6 +85,12 @@ export default {
 .ws-send {
   .after-text {
     margin-top: 10px;
+  }
+  .main-user {
+    width: 30px;
+    height: 30px;
+    border: 1px solid $bili-blue;
+    border-radius: 50%;
   }
 }
 </style>

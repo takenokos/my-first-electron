@@ -20,8 +20,8 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 576,
-    width: 1024,
+    height: 550,
+    width: 980,
     useContentSize: true,
     frame: false, // 去除菜单
     transparent: true, // 透明窗口
