@@ -97,6 +97,7 @@ export default {
   overflow: hidden;
 }
 .login-dialog {
+  overflow: hidden;
   & /deep/ .el-dialog {
     position: absolute;
     top: 50%;

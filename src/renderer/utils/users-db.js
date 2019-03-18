@@ -77,9 +77,9 @@ export function deleteUser (uid) {
 // 主用户的内容
 // 获取主用户id
 export function getMainUid () {
-  return Promise.resolve(db.read().get(dbMainUser))
+  return Promise.resolve(db.read().get(dbMainUser).value())
 }
 // 设置主用户id
 export function setMainUid (uid) {
-  db.read().set(dbMainUser, uid).write()
+  return Promise.resolve(db.read().set(dbMainUser, uid).write())
 }

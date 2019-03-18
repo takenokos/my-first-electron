@@ -1,5 +1,5 @@
 
-import { getUsers, addUser, deleteUser, updateUser } from '@/utils/users-db.js'
+import { getUsers, addUser, deleteUser, updateUser, getMainUid, setMainUid } from '@/utils/users-db.js'
 import { getUserInfo } from '@/api/user'
 const state = {
   users: [],
@@ -38,7 +38,7 @@ const mutations = {
 
 const actions = {
   // 获取全部用户
-  async getUsers ({ dispatch, commit }) {
+  getUsers ({ dispatch, commit }) {
     commit('CLEAR_USERS')
     getUsers().then(data => {
       dispatch('getUserInfo', data)
@@ -94,11 +94,28 @@ const actions = {
   updateUser ({ commit }, obj) {
     updateUser(obj)
     commit('UPDATE_USER', obj)
+  },
+  // 获取主用户uid
+  getMainUser ({ commit }) {
+    getMainUid().then(uid => {
+      commit('SET_MAIN_UID', uid)
+    })
+  },
+  // 更新主用户uid
+  updateMainUser ({ commit }, uid) {
+    setMainUid(uid).then(() => {
+      commit('SET_MAIN_UID', uid)
+    })
   }
 }
 const getters = {
   users: state => state.users,
-  mainuser: state => state.users.find(item => item.uid === state.main_uid)
+  mainUser: state => state.users.find(item => item.uid === state.main_uid),
+  isMain: state => {
+    return uid => {
+      return uid === state.main_uid
+    }
+  }
 }
 
 export default {

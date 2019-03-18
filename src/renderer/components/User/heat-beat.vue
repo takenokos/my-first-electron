@@ -1,7 +1,7 @@
 <template>
   <el-progress
     :percentage="(tick/dTick)*100"
-    :width="100"
+    :width="40"
     type="circle"
     status="text"
     title="心跳计时"
@@ -91,6 +91,6 @@ export default {
 </script>
 <style lang="scss" scoped>
 .heart-time {
-  font-size: 18px;
+  font-size: 12px;
 }
 </style>
