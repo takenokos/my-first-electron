@@ -10,7 +10,7 @@
 <script>
 import TitleBar from '@/views/layout/title-bar'
 export default {
-  name: 'my-first-electron',
+  name: 'bililive-pigeon',
   components: {
     TitleBar
   }
@@ -28,6 +28,25 @@ html {
   margin: 0;
   box-sizing: border-box;
 }
+
+/* 自定义滚动条 */
+// 滚动条整体
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  background-color: transparent;
+}
+// 滚动条的滑块
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 3px;
+}
+// 滚动条的轨道
+::-webkit-scrollbar-track {
+  display: none;
+}
+/* end 自定义滚动条 */
+
 #app {
   display: flex;
   flex-direction: column;

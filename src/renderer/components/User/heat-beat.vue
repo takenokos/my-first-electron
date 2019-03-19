@@ -81,7 +81,7 @@ export default {
     // 用户信息失效处理
     setUserEnable () {
       this.time = '失效'
-      this.$store.dispatch('updateUser', {
+      this.$store.dispatch('updateUserData', {
         uid: this.uid,
         enable: false
       })

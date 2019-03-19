@@ -1,4 +1,4 @@
-import db from '../../db/index'
+import db from './index'
 import { Message } from 'element-ui'
 const dbName = 'users'
 const dbMainUser = 'main_uid'
@@ -62,7 +62,7 @@ export function updateUser (obj) {
   })
 }
 // 删除用户信息 登出
-export function deleteUser (uid) {
+export function deleteUserByUid (uid) {
   return new Promise((resolve) => {
     userDb()
       .remove({ uid: uid }).write()

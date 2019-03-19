@@ -1,20 +1,21 @@
 <template>
   <div class="websocket">
     <div class="websocket-top">
-      <label>房间号：</label>
-      <el-input
-        style="width:110px;"
-        v-model.number="roomId"
-        size="mini"
-        placeholder="房间号"
-      />
+      <label>房间号：
+        <el-input
+          v-model.number="roomId"
+          placeholder="房间号"
+          size="mini"
+          style="width:110px"
+        />
+      </label>
       <el-button
         :disabled="isLink"
         type="primary"
         size="mini"
         plain
         round
-        @click="linkRoom"
+        @click="getTrueRoom"
       >连接</el-button>
       <el-button
         :disabled="!isLink"
@@ -25,11 +26,25 @@
         @click="disconnectRoom"
       >断开</el-button>
     </div>
-    <div class="websocket-box">
+    <div class="websocket-top">
+      <label>人气值：{{popularity}}</label>
+      <el-input
+        v-model="filterKey"
+        placeholder="弹幕池过滤"
+        size="mini"
+        clearable
+        style="width:242px"
+      />
+    </div>
+    <div
+      ref="danmuBox"
+      class="websocket-box"
+    >
       <p
-        v-for="(item,index) in wsMessages"
+        v-for="(msg,index) in danmuShow"
         :key="index"
-      >{{item}}</p>
+        v-html="msg"
+      />
     </div>
   </div>
 </template>
@@ -40,6 +55,9 @@ import {
   getPopularity,
   getMessage
 } from './danmu.js'
+import { addText } from './txt-file'
+import { getRoomId, setRoomId } from '@/db/danmu'
+import { getTrueRoomId } from '@/api/room'
 import { setTimeout } from 'timers'
 export default {
   name: 'WebSocket',
@@ -53,28 +71,77 @@ export default {
     return {
       isLink: false,
       roomId: null,
+      trueRoomId: null,
       popularity: 0, // 人气值
+      filterKey: '', // 弹幕池过滤
       wsMessages: ['请先连接房间'], // 弹幕池
       WebSocket: null,
       heartBeat: null, // 心跳定时器
       reConnectNumber: 10 // 重连次数
     }
   },
+  computed: {
+    danmuShow () {
+      return this.wsMessages
+        .filter(msg => msg.indexOf(this.filterKey) > -1)
+        .map(msg => {
+          if (!this.filterKey) {
+            return msg
+          }
+          // 匹配关键字正则
+          const replaceReg = new RegExp(this.filterKey, 'g')
+          // 高亮替换v-html值
+          const replaceHtml =
+            '<span class="highlight-text">' + this.filterKey + '</span>'
+          // 开始替换
+          return msg.replace(replaceReg, replaceHtml)
+        })
+    }
+  },
+  created () {
+    this.getRoom()
+  },
   destroyed () {
     clearInterval(this.heartBeat)
     this.WebSocket = null
   },
   methods: {
-    // 连接房间 弹幕池
-    linkRoom () {
-      if (!this.roomId) {
+    // 获取上次连接的房间号
+    getRoom () {
+      getRoomId().then(id => {
+        this.roomId = id
+      })
+    },
+    // 获取真实房间号
+    getTrueRoom () {
+      const reg = /^[0-9]*$/
+      if (!this.roomId || !reg.test(this.roomId)) {
         this.$message({
           type: 'warning',
-          message: '请填写房间号'
+          message: '请正确输入房间号'
         })
         return
       }
-      this.wsMessages.push('连接中...')
+      this.pushMessage('连接中...')
+      getTrueRoomId(this.roomId).then(res => {
+        if (res.msg === 'ok') {
+          this.trueRoomId = res.data.room_id
+          this.pushMessage(`获取到真实房间号:${this.trueRoomId}`)
+          // 更新本地存储的房间号
+          setRoomId(this.roomId)
+          // 开始连接
+          this.linkRoom()
+        } else {
+          this.$message({
+            type: 'warning',
+            message: '房间号无效'
+          })
+          this.pushMessage('房间号无效，请重新输入')
+        }
+      })
+    },
+    // 连接房间 弹幕池
+    linkRoom () {
       // 连接弹幕池
       this.WebSocket = new WebSocket(
         'wss://broadcastlv.chat.bilibili.com:2245/sub'
@@ -82,7 +149,7 @@ export default {
       this.WebSocket.binaryType = 'arraybuffer'
       // 进房请求
       this.WebSocket.onopen = () => {
-        this.sendData(7, JSON.stringify({ roomid: this.roomId }))
+        this.sendData(7, JSON.stringify({ roomid: this.trueRoomId }))
       }
 
       // 接收
@@ -94,14 +161,14 @@ export default {
     reConnect () {
       // 尝试重连10次
       if (this.reConnectNumber === 10) {
-        this.wsMessages.push('连接意外断开，正在尝试重连...')
+        this.pushMessage('连接意外断开，正在尝试重连...')
       } else if (this.reConnectNumber > 0) {
         setTimeout(() => {
           this.linkRoom()
           this.reConnectNumber--
         }, 10000)
       } else {
-        this.wsMessages.push('连接已断开，请稍后再试')
+        this.pushMessage('连接已断开，请稍后再试')
         this.isLink = false
       }
     },
@@ -116,9 +183,10 @@ export default {
               type: 'success',
               message: '连接成功'
             })
-            this.wsMessages.push('连接成功')
+            this.pushMessage('连接成功')
 
             // 之后发送心跳
+            this.sendData(2, '') // 直接发送一次获取人气值
             this.heartBeat = setInterval(() => {
               this.sendData(2, '')
             }, 30000)
@@ -139,16 +207,19 @@ export default {
     consoleWs (body) {
       switch (body.cmd) {
         case 'DANMU_MSG': // 弹幕消息
-          const logMsg = `${body.info[2][1]}: ${body.info[1]}`
+          const msgTime = this.newTime(body.info[9].ts * 1000)
+          const logMsg = `[${msgTime}] ${body.info[2][1]}: ${body.info[1]}`
           console.log(logMsg)
-          this.wsMessages.push(logMsg)
+          this.pushMessage(logMsg)
+          this.addToFile(logMsg)
           break
         case 'SEND_GIFT': // 礼物消息
-          const logGift = `${body.data.uname} ${body.data.action} ${
-            body.data.num
-          } 个 ${body.data.giftName}`
+          const giftTime = this.newTime(body.data.timestamp * 1000)
+          const logGift = `[${giftTime}] ${body.data.uname} ${
+            body.data.action
+          } ${body.data.num} 个 ${body.data.giftName}~`
           console.log(logGift)
-          this.wsMessages.push(logGift)
+          this.pushMessage(logGift)
           break
         case 'WELCOME':
           console.log(`欢迎 ${body.data.uname}`)
@@ -190,8 +261,30 @@ export default {
           type: 'info',
           message: '断开连接'
         })
-        this.wsMessages.push('连接已断开')
+        this.pushMessage('连接已断开')
       }
+    },
+    // time formate
+    newTime (timestamp) {
+      const date = new Date(timestamp)
+      const h = date.getHours()
+      const m = date.getMinutes()
+      const s = date.getSeconds()
+
+      const hh = h > 9 ? h : '0' + h
+      const mm = m > 9 ? m : '0' + m
+      const ss = s > 9 ? s : '0' + s
+      return hh + ':' + mm + ':' + ss
+    },
+    // 弹幕文件写入
+    pushMessage (text) {
+      this.wsMessages.push(text)
+      this.$nextTick(() => {
+        this.$refs.danmuBox.scrollTop = this.$refs.danmuBox.scrollHeight
+      })
+    },
+    addToFile (text) {
+      addText(this.roomId, text)
     }
   }
 }
@@ -201,13 +294,12 @@ export default {
   display: flex;
   flex-direction: column;
   .websocket-top {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
     margin-bottom: 10px;
     label {
       font-size: 12px;
-    }
-    .el-input,
-    .el-button {
-      margin-left: 10px;
     }
   }
   .websocket-box {
@@ -216,6 +308,7 @@ export default {
     height: 100%;
     padding: 5px;
     font-size: 12px;
+    overflow-y: auto;
   }
 }
 </style>

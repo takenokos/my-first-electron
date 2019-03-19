@@ -1,8 +1,8 @@
 {
-  "name": "my-first-electron",
+  "name": "bililive-pigeon",
   "version": "0.0.1",
   "author": "Takenokos <595693858@qq.com>",
-  "description": "my first electron",
+  "description": "bililive pigeon",
   "license": null,
   "main": "./dist/electron/main.js",
   "scripts": {
@@ -22,8 +22,8 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "my-first-electron",
-    "appId": "my-first-electron",
+    "productName": "bililive-pigeon",
+    "appId": "bililive-pigeon",
     "directories": {
       "output": "build"
     },
