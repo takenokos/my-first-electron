@@ -70,7 +70,7 @@ export default {
             })
             if (cookieObj.DedeUserID) {
               // DedeUserID 是 用户 uid
-              await this.$store.dispatch('addUser', cookieObj)
+              await this.$store.dispatch('loginUser', cookieObj)
               session.clearStorageData({
                 storages: ['cookies']
               })

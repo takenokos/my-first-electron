@@ -1,5 +1,5 @@
 
-import { getUsers, addUser, deleteUser, updateUser, getMainUid, setMainUid } from '@/utils/users-db.js'
+import { getUsers, addUser, deleteUserByUid, updateUser, getMainUid, setMainUid } from '@/db/users.js'
 import { getUserInfo } from '@/api/user'
 const state = {
   users: [],
@@ -41,11 +41,11 @@ const actions = {
   getUsers ({ dispatch, commit }) {
     commit('CLEAR_USERS')
     getUsers().then(data => {
-      dispatch('getUserInfo', data)
+      dispatch('getUsersInfo', data)
     })
   },
   // 用户信息 递归
-  getUserInfo ({ dispatch, commit }, data) {
+  getUsersInfo ({ dispatch, commit }, data) {
     if (data.length <= 0) {
       return
     }
@@ -69,10 +69,10 @@ const actions = {
   addTo ({ dispatch, commit }, { user, data }) {
     commit('ADD_USER', user)
     data.shift() // 删除第一个
-    dispatch('getUserInfo', data)
+    dispatch('getUsersInfo', data)
   },
   // 添加用户 登陆
-  addUser ({ commit }, cookie) {
+  loginUser ({ commit }, cookie) {
     const obj = {
       uid: parseInt(cookie.DedeUserID),
       enable: true,
@@ -86,12 +86,12 @@ const actions = {
   },
   // 删除用户 登出
   deleteUser ({ commit }, uid) {
-    deleteUser(uid).then(() => {
+    deleteUserByUid(uid).then(() => {
       commit('DELETE_USER', uid)
     })
   },
   // 更新用户
-  updateUser ({ commit }, obj) {
+  updateUserData ({ commit }, obj) {
     updateUser(obj)
     commit('UPDATE_USER', obj)
   },

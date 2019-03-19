@@ -1,4 +1,4 @@
-import request from '@/utils/https'
+import request from './request'
 // 获取用户信息
 export function getUserInfo (cookieObj) {
   return request({

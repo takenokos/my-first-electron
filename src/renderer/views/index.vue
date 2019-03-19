@@ -26,7 +26,6 @@ export default {
   .index-main__left {
     margin-right: 10px;
     float: left;
-    width: 608px;
   }
   .index-main__right {
     display: flex;
