@@ -2,6 +2,8 @@ import https from 'https'
 import url from 'url'
 import qs from 'querystring'
 import { Message } from 'element-ui'
+
+import FormData from 'form-data'
 const BiliApi = 'api.live.bilibili.com'
 export default function (config) {
   // url
@@ -20,19 +22,20 @@ export default function (config) {
     options.path += '?' + params
   }
   // post data
-  const postData = typeof config.data === 'string'
-    ? config.data
-    : JSON.stringify(config.data || {})
+  // const postData = typeof config.data === 'string'
+  //   ? config.data
+  //   : qs.stringify(config.data || {})
+
   // set headers
-  if (config.headers) {
+  if (config.headers || options.method === 'POST') {
     switch (options.method) {
       case 'GET':
         options.headers = config.headers
         break
       case 'POST':
         options.headers = Object.assign({
-          'Content-Type': 'application/json',
-          'Content-Length': Buffer.byteLength(postData)
+          'Content-Type': 'application/json'
+          // 'Content-Length': postData.length
         }, config.headers)
         break
     }
@@ -48,6 +51,7 @@ export default function (config) {
   }
   // https request
   return new Promise((resolve, reject) => {
+    console.log(options)
     const req = https.request(options, res => {
       const statusCode = res.statusCode
       if (statusCode !== 200) {
@@ -66,9 +70,18 @@ export default function (config) {
         rawData += chunk
       })
       res.on('end', () => {
+        console.log(rawData)
         resolve(JSON.parse(rawData))
       })
     })
+    if (options.method === 'POST') {
+      let postData = new FormData()
+      Object.keys(config.data).forEach(key => {
+        postData.append(key, config.data[key])
+      })
+      postData.pipe(req)
+      req.write(postData + '')
+    }
     req.on('error', e => {
       Message({
         message: e,
@@ -76,9 +89,6 @@ export default function (config) {
       })
       reject(e)
     })
-    if (options.method === 'POST') {
-      req.write(postData)
-    }
     req.end()
   })
 }
