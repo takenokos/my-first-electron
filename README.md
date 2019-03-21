@@ -1,6 +1,6 @@
 # bililive-pigeon
 
-> bililive pigeon
+> 基于electron-vue 写着玩的东西，大概是个弹幕池吧
 
 #### Build Setup
 
