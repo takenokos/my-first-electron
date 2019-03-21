@@ -81,7 +81,7 @@ function createWindow () {
   /* end barrage window */
 
   /* 系统托盘 */
-  const trayIcon = `${__static}/icon.ico`
+  const trayIcon = `${__static}/icon.png`
   const tray = new Tray(trayIcon)
   const contextMenu = Menu.buildFromTemplate([
     {

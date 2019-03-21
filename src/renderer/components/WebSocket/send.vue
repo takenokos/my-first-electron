@@ -8,7 +8,8 @@
       resize="none"
       placeholder="请输入弹幕内容desu~"
       :maxlength="maxlength"
-      @keyup.enter.native="send"
+      @keydown.enter.native.stop="$event.returnValue = false"
+      @keyup.enter.native.stop="send"
     />
     <div class="after-text">
       <el-tooltip :content="content">
@@ -77,11 +78,7 @@ export default {
   methods: {
     // 弹幕发送的方法
     send () {
-      if (!this.user || !this.user.enable) {
-        this.$message({
-          type: 'warning',
-          message: '请选择主用户DA☆ZE~'
-        })
+      if (!this.user || !this.user.enable || !this.text) {
         return
       }
       const data = {
@@ -95,7 +92,9 @@ export default {
         csrf_token: this.user.cookie.bili_jct,
         csrf: this.user.cookie.bili_jct
       }
-      danmuSend(data)
+      danmuSend(data, this.user.cookie).then(() => {
+        this.text = ''
+      })
     },
     toggleBarrage (bol) {
       this.$electron.ipcRenderer.send('toggle-barrage', bol)

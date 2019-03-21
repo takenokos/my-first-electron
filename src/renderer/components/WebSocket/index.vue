@@ -127,28 +127,35 @@ export default {
         type: 'local',
         text: '连接中...'
       })
-      getTrueRoomId(this.roomId).then(res => {
-        if (res.msg === 'ok') {
-          this.$store.dispatch('setTrueRoomId', res.data.room_id)
+      getTrueRoomId(this.roomId)
+        .then(res => {
+          if (res.msg === 'ok') {
+            this.$store.dispatch('setTrueRoomId', res.data.room_id)
+            this.pushMessage({
+              type: 'local',
+              text: `真实房间号:${this.trueRoomId}`
+            })
+            // 更新本地存储的房间号
+            setRoomId(this.roomId)
+            // 开始连接
+            this.linkRoom()
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '房间号无效'
+            })
+            this.pushMessage({
+              type: 'local',
+              text: '房间号无效'
+            })
+          }
+        })
+        .catch(() => {
           this.pushMessage({
             type: 'local',
-            text: `真实房间号:${this.trueRoomId}`
+            text: '连接失败'
           })
-          // 更新本地存储的房间号
-          setRoomId(this.roomId)
-          // 开始连接
-          this.linkRoom()
-        } else {
-          this.$message({
-            type: 'warning',
-            message: '房间号无效'
-          })
-          this.pushMessage({
-            type: 'local',
-            text: '房间号无效'
-          })
-        }
-      })
+        })
     },
     // 连接房间 弹幕池
     linkRoom () {
@@ -175,11 +182,12 @@ export default {
           type: 'local',
           text: '连接意外断开，正在尝试重连...'
         })
-      } else if (this.reConnectNumber > 0) {
+      }
+      if (this.reConnectNumber > 0) {
         setTimeout(() => {
           this.linkRoom()
           this.reConnectNumber--
-        }, 10000)
+        }, 3 * 1000)
       } else {
         this.pushMessage({
           type: 'local',

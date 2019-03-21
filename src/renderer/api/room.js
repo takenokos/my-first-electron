@@ -3,23 +3,17 @@ import request from './request'
 export function getTrueRoomId (id) {
   return request({
     url: '/room/v1/Room/room_init',
-    method: 'get',
-    params: {
+    method: 'GET',
+    qs: {
       id
     }
   })
 }
 // 发送弹幕消息
-export function danmuSend (data) {
+export function danmuSend (data, cookieObj) {
   return request({
+    method: 'POST',
     url: '/msg/send',
-    // url: 'https://live.bilibili.com/msg/send',
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      'Origin': 'https://live.bilibili.com',
-      'Referer': `https://live.bilibili.com/${data.roomid}`
-    },
-    data
-  })
+    form: data
+  }, cookieObj)
 }
