@@ -58,7 +58,6 @@ import {
 import { addText } from './txt-file'
 import { getRoomId, setRoomId } from '@/db/danmu'
 import { getTrueRoomId } from '@/api/room'
-import { setTimeout } from 'timers'
 export default {
   name: 'WebSocket',
   props: {
@@ -71,7 +70,6 @@ export default {
     return {
       isLink: false,
       roomId: null,
-      trueRoomId: null,
       popularity: 0, // 人气值
       filterKey: '', // 弹幕池过滤
       wsMessages: ['请先连接房间'], // 弹幕池
@@ -96,6 +94,9 @@ export default {
           // 开始替换
           return msg.replace(replaceReg, replaceHtml)
         })
+    },
+    trueRoomId () {
+      return this.$store.getters.trueRoomId
     }
   },
   created () {
@@ -122,23 +123,39 @@ export default {
         })
         return
       }
-      this.pushMessage('连接中...')
-      getTrueRoomId(this.roomId).then(res => {
-        if (res.msg === 'ok') {
-          this.trueRoomId = res.data.room_id
-          this.pushMessage(`获取到真实房间号:${this.trueRoomId}`)
-          // 更新本地存储的房间号
-          setRoomId(this.roomId)
-          // 开始连接
-          this.linkRoom()
-        } else {
-          this.$message({
-            type: 'warning',
-            message: '房间号无效'
-          })
-          this.pushMessage('房间号无效，请重新输入')
-        }
+      this.pushMessage({
+        type: 'local',
+        text: '连接中...'
       })
+      getTrueRoomId(this.roomId)
+        .then(res => {
+          if (res.msg === 'ok') {
+            this.$store.dispatch('setTrueRoomId', res.data.room_id)
+            this.pushMessage({
+              type: 'local',
+              text: `真实房间号:${this.trueRoomId}`
+            })
+            // 更新本地存储的房间号
+            setRoomId(this.roomId)
+            // 开始连接
+            this.linkRoom()
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '房间号无效'
+            })
+            this.pushMessage({
+              type: 'local',
+              text: '房间号无效'
+            })
+          }
+        })
+        .catch(() => {
+          this.pushMessage({
+            type: 'local',
+            text: '连接失败'
+          })
+        })
     },
     // 连接房间 弹幕池
     linkRoom () {
@@ -161,14 +178,21 @@ export default {
     reConnect () {
       // 尝试重连10次
       if (this.reConnectNumber === 10) {
-        this.pushMessage('连接意外断开，正在尝试重连...')
-      } else if (this.reConnectNumber > 0) {
+        this.pushMessage({
+          type: 'local',
+          text: '连接意外断开，正在尝试重连...'
+        })
+      }
+      if (this.reConnectNumber > 0) {
         setTimeout(() => {
           this.linkRoom()
           this.reConnectNumber--
-        }, 10000)
+        }, 3 * 1000)
       } else {
-        this.pushMessage('连接已断开，请稍后再试')
+        this.pushMessage({
+          type: 'local',
+          text: '重连失败，请稍后再试'
+        })
         this.isLink = false
       }
     },
@@ -183,7 +207,10 @@ export default {
               type: 'success',
               message: '连接成功'
             })
-            this.pushMessage('连接成功')
+            this.pushMessage({
+              type: 'local',
+              text: '连接成功'
+            })
 
             // 之后发送心跳
             this.sendData(2, '') // 直接发送一次获取人气值
@@ -207,19 +234,24 @@ export default {
     consoleWs (body) {
       switch (body.cmd) {
         case 'DANMU_MSG': // 弹幕消息
-          const msgTime = this.newTime(body.info[9].ts * 1000)
-          const logMsg = `[${msgTime}] ${body.info[2][1]}: ${body.info[1]}`
-          console.log(logMsg)
-          this.pushMessage(logMsg)
-          this.addToFile(logMsg)
+          const msgObj = {
+            type: 'msg',
+            timestamp: body.info[9].ts,
+            uname: body.info[2][1],
+            text: body.info[1]
+          }
+          this.pushMessage(msgObj)
           break
         case 'SEND_GIFT': // 礼物消息
-          const giftTime = this.newTime(body.data.timestamp * 1000)
-          const logGift = `[${giftTime}] ${body.data.uname} ${
-            body.data.action
-          } ${body.data.num} 个 ${body.data.giftName}~`
-          console.log(logGift)
-          this.pushMessage(logGift)
+          const giftObj = {
+            type: 'gift',
+            timestamp: body.data.timestamp,
+            uname: body.data.uname,
+            text: `${body.data.action} ${body.data.num} 个 ${
+              body.data.giftName
+            }~`
+          }
+          this.pushMessage(giftObj)
           break
         case 'WELCOME':
           console.log(`欢迎 ${body.data.uname}`)
@@ -261,7 +293,10 @@ export default {
           type: 'info',
           message: '断开连接'
         })
-        this.pushMessage('连接已断开')
+        this.pushMessage({
+          type: 'local',
+          text: '连接已断开'
+        })
       }
     },
     // time formate
@@ -276,13 +311,34 @@ export default {
       const ss = s > 9 ? s : '0' + s
       return hh + ':' + mm + ':' + ss
     },
-    // 弹幕文件写入
-    pushMessage (text) {
+    // 弹幕池展示
+    pushMessage (param) {
+      let text = ''
+      const time = this.newTime(
+        param.timestamp ? param.timestamp * 1000 : new Date().getTime()
+      )
+      switch (param.type) {
+        case 'local':
+          text = param.text
+          break
+        case 'msg':
+          text = `[${time}] ${param.uname}: ${param.text}`
+          this.addToFile(text)
+          break
+        case 'gift':
+          text = `[${time}] ${param.uname} ${param.text}`
+          break
+      }
       this.wsMessages.push(text)
+      // 发送 添加弹幕 事件至主线程
+      const json = Object.assign({}, param, { time })
+      this.$electron.ipcRenderer.send('add-danmu', json)
+      // 滚动到底部
       this.$nextTick(() => {
         this.$refs.danmuBox.scrollTop = this.$refs.danmuBox.scrollHeight
       })
     },
+    // 弹幕聊天消息保存
     addToFile (text) {
       addText(this.roomId, text)
     }
