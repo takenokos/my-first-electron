@@ -32,8 +32,9 @@ install:
 - nvm install 8.9
 - curl -o- -L https://yarnpkg.com/install.sh | bash
 - source ~/.bashrc
-- npm install -g xvfb-maybe
-- npm install -g cfonts
+# - npm install -g xvfb-maybe
+# - npm install -g cfonts
+- npm install
 # - yarn
 script:
 #- xvfb-maybe node_modules/.bin/karma start test/unit/karma.conf.js
