@@ -86,6 +86,7 @@ export default {
         enable: false
       })
     }
+    // 这里大概要加刷新用户信息的方法
   }
 }
 </script>
