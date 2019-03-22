@@ -1,14 +1,14 @@
 <template>
   <transition-group
-    name="el-fade-in"
+    name="slide-fade"
     class="barrage"
     tag="div"
   >
     <div
-      v-for="(msg,index) of showList"
-      :key="index"
+      v-for="msg of showList"
+      :key="msg.num"
       class="message"
-      v-html="msg"
+      v-html="msg.text"
     />
   </transition-group>
 </template>
@@ -39,7 +39,10 @@ export default {
           }</span>] <span class="uname">${json.uname}</span> ${json.text}`
           break
       }
-      this.showList.push(text)
+      this.showList.push({
+        text,
+        num: json.num
+      })
       setTimeout(() => {
         this.showList.shift()
       }, 3 * 1000)
@@ -54,21 +57,38 @@ html {
   overflow: hidden;
   margin: 0;
 }
+* {
+  transform: translateZ(0);
+}
 .barrage {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   height: 100%;
-  color: #f77534;
+  color: #fabf72;
   .message {
+    display: block;
     padding: 2px;
     background-color: rgba(0, 0, 0, 0.1);
   }
   .time {
-    color: #f18080;
+    color: #fc9f9f;
   }
   .uname {
     color: #23ade5;
   }
 }
+// 过渡动画
+.slide-fade-enter-active {
+  transition: all 0.3s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.8s ease;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  transform: translateX(10px);
+  opacity: 0;
+}
+// end 过渡动画
 </style>
