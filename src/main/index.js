@@ -82,7 +82,7 @@ function createWindow () {
 
   barrageWin.loadURL(barrageURL)
   // 鼠标穿透
-  // barrageWin.setIgnoreMouseEvents(true)
+  barrageWin.setIgnoreMouseEvents(true)
   // 不能获取焦点 任务栏不显示
   barrageWin.setFocusable(false)
   /* end barrage window */

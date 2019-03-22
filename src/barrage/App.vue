@@ -56,7 +56,9 @@ html {
   height: 100%;
   overflow: hidden;
   margin: 0;
-  transform: translate3d(0, 0, 0) / translateZ(0);
+}
+* {
+  transform: translateZ(0);
 }
 .barrage {
   display: flex;
