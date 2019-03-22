@@ -331,7 +331,10 @@ export default {
       }
       this.wsMessages.push(text)
       // 发送 添加弹幕 事件至主线程
-      const json = Object.assign({}, param, { time })
+      const json = Object.assign({}, param, {
+        time,
+        num: this.wsMessages.length
+      })
       this.$electron.ipcRenderer.send('add-danmu', json)
       // 滚动到底部
       this.$nextTick(() => {

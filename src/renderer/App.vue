@@ -22,8 +22,7 @@ html {
   height: 100%;
   overflow: hidden;
   color: #666;
-}
-* {
+  transform: translate3d(0, 0, 0) / translateZ(0);
   padding: 0;
   margin: 0;
   box-sizing: border-box;

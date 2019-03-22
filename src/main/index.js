@@ -35,7 +35,9 @@ function createWindow () {
       webSecurity: false, // 设置跨域
       allowDisplayingInsecureContent: true, // 允许http资源
       allowRunningInsecureContent: true
-    }
+    },
+    show: false, // 初始化隐藏
+    backgroundColor: '#ffffff'
   })
 
   mainWindow.loadURL(winURL)
@@ -56,6 +58,11 @@ function createWindow () {
   mainWindow.on('hide', () => {
     tray.setHighlightMode('never')
   })
+  // 窗口准备好后显示
+  mainWindow.on('ready-to-show', function () {
+    mainWindow.show()
+    mainWindow.focus()
+  })
   /* end main window */
 
   /* barrage window */
@@ -75,7 +82,7 @@ function createWindow () {
 
   barrageWin.loadURL(barrageURL)
   // 鼠标穿透
-  barrageWin.setIgnoreMouseEvents(true)
+  // barrageWin.setIgnoreMouseEvents(true)
   // 不能获取焦点 任务栏不显示
   barrageWin.setFocusable(false)
   /* end barrage window */

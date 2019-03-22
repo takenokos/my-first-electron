@@ -53,7 +53,7 @@ export default {
 <style lang="scss" scoped>
 .scroll {
   height: 100%;
-  width: 606px;
+  width: 612px;
   background-color: #fff;
   overflow-y: auto;
 }
