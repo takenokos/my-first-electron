@@ -3,6 +3,7 @@
     class="login-dialog"
     title="登陆"
     top="0"
+    append-to-body
     :visible.sync="dialogVisible"
     @opened="open"
   >
