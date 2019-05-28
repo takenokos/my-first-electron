@@ -93,7 +93,7 @@ export default {
 .login-webview {
   width: 420px;
   height: 490px;
-  margin: -112px auto 0 auto;
+  margin: -112px auto -64px auto;
   border-radius: 8px;
   overflow: hidden;
 }

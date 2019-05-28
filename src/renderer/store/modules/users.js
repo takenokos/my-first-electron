@@ -15,6 +15,7 @@ const mutations = {
   ADD_USER (state, user) {
     const bol = state.users.some(obj => obj.uid === user.uid)
     !bol && state.users.push(user)
+    console.log(state.users)
   },
   // 删除用户
   DELETE_USER (state, uid) {
@@ -56,9 +57,15 @@ const actions = {
     }
     const cookie = item.cookie
     getUserInfo(cookie).then(res => {
-      const user = Object.assign({}, item, { info: res.data })
-      updateUser(user)
-      dispatch('addTo', { user, data })
+      if (res.code === 0) {
+        const user = Object.assign({}, item, { info: res.data })
+        updateUser(user)
+        dispatch('addTo', { user, data })
+      } else {
+        item.enable = false
+        updateUser(item)
+        dispatch('addTo', { user: item, data })
+      }
     }).catch(() => { // 接口返回出错 cookie 无效
       item.enable = false
       updateUser(item)
@@ -79,7 +86,7 @@ const actions = {
       cookie
     }
     getUserInfo(cookie).then(res => {
-      const user = Object.assign({}, obj, { info: res.data })
+      const user = res.code === 0 ? Object.assign({}, obj, { info: res.data }) : { ...obj }
       addUser(user)
       commit('ADD_USER', user)
     })
