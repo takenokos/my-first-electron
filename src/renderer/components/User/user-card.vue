@@ -60,7 +60,7 @@ export default {
   props: {
     user: {
       type: Object,
-      required: () => {}
+      required: () => { }
     }
   },
   components: {
@@ -74,11 +74,11 @@ export default {
       return this.user.cookie
     },
     percentage () {
-      return this.info.user_intimacy
+      return this.info.user_next_intimacy
         ? parseFloat(
           (
             (this.info.user_intimacy / this.info.user_next_intimacy) *
-              100
+            100
           ).toFixed(2)
         )
         : 0

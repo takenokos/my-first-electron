@@ -11,13 +11,18 @@
           @click="loginDialogVisible=true"
         >添加用户</el-button>
       </el-card>
-      <user-card
-        v-for="item in users"
-        :key="item.uid"
-        :user="item"
-        class="users__card"
+      <template v-if="users.length>0">
+        <user-card
+          v-for="item in users"
+          :key="item.uid"
+          :user="item"
+          class="users__card"
+        />
+      </template>
+      <login-dialog
+        :visible.sync="loginDialogVisible"
+        @login="getUsers()"
       />
-      <login-dialog :visible.sync="loginDialogVisible" />
     </div>
   </div>
 </template>

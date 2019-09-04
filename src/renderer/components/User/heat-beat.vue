@@ -3,10 +3,10 @@
     :percentage="(tick/dTick)*100"
     :width="40"
     type="circle"
-    status="text"
     title="心跳计时"
     color="#23ade5"
-  ><span class="heart-time">{{time}}</span></el-progress>
+    :format="()=>{return time}"
+  />
 </template>
 <script>
 import { userHeartBeat } from '@/api/user'
@@ -24,7 +24,7 @@ export default {
     },
     cookie: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data () {
@@ -91,7 +91,7 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.heart-time {
-  font-size: 12px;
+/deep/ .el-progress__text {
+  font-size: 12px !important;
 }
 </style>
