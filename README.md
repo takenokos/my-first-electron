@@ -1,4 +1,6 @@
 # bililive-pigeon
+[![AppVeyor status](https://img.shields.io/appveyor/ci/takenokos/bililive-pigeon/master?label=appveyor&logo=appveyor&logoColor=cccccc)](https://ci.appveyor.com/project/takenokos/bililive-pigeon/branch/master)
+[![Travis status](https://img.shields.io/travis/PigeonDynasty/bililive-pigeon/master?label=travis&logo=travis%20ci&logoColor=cccccc)](https://travis-ci.org/PigeonDynasty/bililive-pigeon)
 
 > 基于electron-vue 写着玩的东西，大概是个弹幕池吧
 
