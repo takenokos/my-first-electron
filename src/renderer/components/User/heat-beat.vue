@@ -49,6 +49,7 @@ export default {
       }
       userHeartBeat(this.cookie)
         .then(res => {
+          console.log('heart-beat', res)
           if (res.code !== 0) {
             this.setUserEnable()
             return
@@ -57,7 +58,8 @@ export default {
           this.tick = defaultTick
           this.timeTick()
         })
-        .catch(() => {
+        .catch((err) => {
+          console.log('heart-beat', err)
           this.setUserEnable()
         })
     },

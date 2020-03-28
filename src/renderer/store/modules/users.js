@@ -15,7 +15,7 @@ const mutations = {
   ADD_USER (state, user) {
     const bol = state.users.some(obj => obj.uid === user.uid)
     !bol && state.users.push(user)
-    console.log(state.users)
+    // console.log(state.users)
   },
   // 删除用户
   DELETE_USER (state, uid) {

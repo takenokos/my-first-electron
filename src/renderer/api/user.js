@@ -4,13 +4,13 @@ export function getUserInfo (cookieObj) {
   return request({
     url: '/xlive/web-ucenter/user/get_user_info',
     method: 'get'
-  },
-  cookieObj)
+  }, cookieObj)
 }
 // 用户心跳
 export function userHeartBeat (cookieObj, roomId = 21825) {
   return request({
-    url: '/User/userOnlineHeart',
+    // url: '/User/userOnlineHeart',
+    url: `relation/v1/feed/heartBeat?_=${new Date().getTime()}`,
     method: 'get',
     headers: {
       'Content-Type': 'text/html; charset=UTF-8',

@@ -1,29 +1,24 @@
 <template>
-  <div class="scroll">
-    <div class="users">
-      <el-card
-        :body-style="{height:'100%',padding:'0'}"
-        shadow="hover"
-        class="user-add"
-      >
-        <el-button
-          icon="el-icon-plus"
-          @click="loginDialogVisible=true"
-        >添加用户</el-button>
-      </el-card>
-      <template v-if="users.length>0">
-        <user-card
-          v-for="item in users"
-          :key="item.uid"
-          :user="item"
-          class="users__card"
-        />
-      </template>
-      <login-dialog
-        :visible.sync="loginDialogVisible"
-        @login="getUsers()"
+  <div class="users">
+    <el-card
+      :body-style="{height:'100%',padding:'0'}"
+      shadow="hover"
+      class="user-add"
+    >
+      <el-button
+        icon="el-icon-plus"
+        @click="loginDialogVisible=true"
+      >添加用户</el-button>
+    </el-card>
+    <template v-if="users.length>0">
+      <user-card
+        v-for="item in users"
+        :key="item.uid"
+        :user="item"
+        class="users__card"
       />
-    </div>
+    </template>
+    <login-dialog :visible.sync="loginDialogVisible" />
   </div>
 </template>
 <script>
@@ -56,15 +51,10 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.scroll {
-  height: 100%;
-  width: 612px;
-  background-color: #fff;
-  overflow-y: auto;
-}
 .users {
   display: flex;
   flex-wrap: wrap;
+  margin: -6px;
   .user-add {
     display: inline-block;
     width: 188px;

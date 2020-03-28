@@ -33,7 +33,7 @@
         placeholder="弹幕池过滤"
         size="mini"
         clearable
-        style="width:242px"
+        style="width:220px"
       />
     </div>
     <div
@@ -58,12 +58,13 @@ import {
 import { addText } from './txt-file'
 import { getRoomId, setRoomId } from '@/db/danmu'
 import { getTrueRoomId } from '@/api/room'
+import { addGiftLog } from '@/db/gift'
 export default {
   name: 'WebSocket',
   props: {
     user: {
       type: Object,
-      default: () => {}
+      default: () => { }
     }
   },
   data () {
@@ -220,11 +221,11 @@ export default {
             break
           case 3: // 心跳回应 会返回人气？
             this.popularity = getPopularity(res.dataView)
-            console.log(`当前人气:${this.popularity}`)
+            // console.log(`当前人气:${this.popularity}`)
             break
           case 5: // 弹幕消息
             const body = getMessage(res)
-            console.log(body)
+            // console.log(body)
             this.consoleWs(body)
             break
         }
@@ -247,32 +248,31 @@ export default {
             type: 'gift',
             timestamp: body.data.timestamp,
             uname: body.data.uname,
-            text: `${body.data.action} ${body.data.num} 个 ${
-              body.data.giftName
-            }~`
+            text: `${body.data.action} ${body.data.num} 个 ${body.data.giftName}~`
           }
+          this.addGiftLog(body.data)
           this.pushMessage(giftObj)
           break
         case 'WELCOME':
-          console.log(`欢迎 ${body.data.uname}`)
+          // console.log(`欢迎 ${body.data.uname}`)
           break
         case 'WELCOME_GUARD': // 舰长消息
-          const getGuardName = index => {
-            switch (index) {
-              case 1:
-                return '总督'
-              case 2:
-                return '提督'
-              case 3:
-                return '舰长'
-            }
-          }
-          const guardName = getGuardName(body.data.guard_level)
-          console.log(`欢迎 ${guardName} ${body.data.username}`)
+          // const getGuardName = index => {
+          //   switch (index) {
+          //     case 1:
+          //       return '总督'
+          //     case 2:
+          //       return '提督'
+          //     case 3:
+          //       return '舰长'
+          //   }
+          // }
+          // const guardName = getGuardName(body.data.guard_level)
+          // console.log(`欢迎 ${guardName} ${body.data.username}`)
           break
         // 此处省略很多其他通知类型
         default:
-          console.log(body)
+        // console.log(body)
       }
     },
     // 发送消息
@@ -344,6 +344,34 @@ export default {
     // 弹幕聊天消息保存
     addToFile (text) {
       addText(this.roomId, text)
+    },
+    addGiftLog (param) {
+      const {
+        giftName,
+        num,
+        uname,
+        face,
+        uid,
+        timestamp,
+        giftId,
+        giftType,
+        action,
+        price,
+        coin_type
+      } = param
+      addGiftLog(this.roomId, {
+        giftName,
+        num,
+        uname,
+        face,
+        uid,
+        timestamp,
+        giftId,
+        giftType,
+        action,
+        price,
+        coin_type
+      })
     }
   }
 }

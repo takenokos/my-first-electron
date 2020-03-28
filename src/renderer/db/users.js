@@ -52,7 +52,7 @@ export function updateUser (obj) {
     } else {
       userDb()
         .find({ uid: obj.uid })
-        .assign(obj)
+        .assign(obj).write()
       Message({
         message: '用户信息已更新',
         type: 'success'

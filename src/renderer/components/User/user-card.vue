@@ -41,10 +41,11 @@
     </div>
     <div class="user-operate">
       <el-button
-        :type="isMain?'success':'warning'"
+        :disabled="isMain"
+        type="success"
         size="mini"
         @click="updateMain"
-      >{{isMain?'撤销主用户':'设为主用户'}}</el-button>
+      >设为主用户</el-button>
       <el-button
         type="danger"
         size="mini"

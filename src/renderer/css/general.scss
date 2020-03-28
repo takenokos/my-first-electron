@@ -5,3 +5,7 @@ $bili-ty:#66ccff;
 .highlight-text {
   color: $bili-blue;
 }
+
+.el-tabs__nav-wrap::after{
+  z-index:-1 !important;// 下划线遮盖问题
+}
