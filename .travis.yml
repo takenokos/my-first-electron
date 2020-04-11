@@ -10,6 +10,7 @@ matrix:
   # - os: linux
     env: CC=clang CXX=clang++ npm_config_clang=1
     compiler: clang
+if: tag IS present # 这里是添加的之后的部分
 cache:
   directories:
   - node_modules
