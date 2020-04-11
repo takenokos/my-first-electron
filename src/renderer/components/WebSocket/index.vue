@@ -54,7 +54,7 @@ import {
   fixMessage,
   getPopularity,
   getMessage
-} from './danmu.js'
+} from '@/common/danmu.js'
 import { addText } from './txt-file'
 import { getRoomId, setRoomId } from '@/db/danmu'
 import { getTrueRoomId } from '@/api/room'
@@ -163,6 +163,7 @@ export default {
       // 连接弹幕池
       this.WebSocket = new WebSocket(
         'wss://broadcastlv.chat.bilibili.com:2245/sub'
+        // 'wss://tx-sh-live-comet-01.chat.bilibili.com/sub'
       )
       this.WebSocket.binaryType = 'arraybuffer'
       // 进房请求
@@ -225,8 +226,11 @@ export default {
             break
           case 5: // 弹幕消息
             const body = getMessage(res)
+            body.forEach(obj => {
+              this.consoleWs(obj)
+            })
             // console.log(body)
-            this.consoleWs(body)
+            // this.consoleWs(body)
             break
         }
       })

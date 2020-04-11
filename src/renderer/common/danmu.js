@@ -1,3 +1,4 @@
+const pako = require('pako')
 const rawHeaderLen = 16
 const packetOffset = 0
 const headerOffset = 4
@@ -53,6 +54,7 @@ export function sendArrayBuffer (type, token) {
   headerView.setInt32(packetOffset, rawHeaderLen + bodyBuf.byteLength)
   headerView.setInt16(headerOffset, rawHeaderLen)
   headerView.setInt16(verOffset, 1)
+  // headerView.setInt16(verOffset, 2)
   headerView.setInt32(opOffset, type)
   headerView.setInt32(seqOffset, 1)
   return mergeArrayBuffer(headerBuf, bodyBuf)
@@ -86,17 +88,43 @@ export function getPopularity (dataView) {
 export function getMessage (res) {
   var packetView = res.dataView
   var msg = res.data
-  let msgBody
   let packetLen = res.packetLen
   let headerLen = res.headerLen
-  for (var offset = 0; offset < msg.byteLength; offset += packetLen) {
+  for (let offset = 0; offset < msg.byteLength; offset += packetLen) {
     packetLen = packetView.getInt32(offset)
     headerLen = packetView.getInt16(offset + headerOffset)
-    msgBody = textDecoder.decode(msg.slice(offset + headerLen, offset + packetLen))
+    const item = msg.slice(offset + headerLen, offset + packetLen)
+    let p
+    try {
+      p = pako.inflate(item)
+    } catch (e) {
+      p = new Uint8Array(item)
+    }
+    return getWsDataview(p.buffer)
+  }
+}
+// 获取弹幕内容
+function getWsDataview (data) {
+  let dataView = new DataView(data, 0)
+  let packetLen = dataView.getInt32(packetOffset)
+  let headerLen = dataView.getInt16(headerOffset)
+  let msgBody
+  let res = []
+  for (let offset = 0; offset < data.byteLength; offset += packetLen) {
+    packetLen = dataView.getInt32(offset)
+    headerLen = dataView.getInt16(offset + headerOffset)
+    const item = data.slice(offset + headerLen, offset + packetLen)
+    const responseArray = new Uint8Array(item)
+    msgBody = new TextDecoder().decode(responseArray)
     if (!msgBody) {
       textDecoder = getDecoder(false)
-      msgBody = textDecoder.decode(msg.slice(offset + headerLen, offset + packetLen))
+      msgBody = textDecoder.decode(data.slice(offset + headerLen, offset + packetLen))
     }
-    return JSON.parse(msgBody)
+    try {
+      res.push(JSON.parse(msgBody))
+    } catch (e) {
+      console.log(msgBody)
+    }
   }
+  return res
 }

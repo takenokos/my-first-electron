@@ -13,6 +13,7 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 let webConfig = {
   devtool: '#cheap-module-eval-source-map',
+  // devtool: '#source-map',
   entry: {
     web: path.join(__dirname, '../src/renderer/main.js'),
     barrage: path.join(__dirname, '../src/barrage/main.js'),
